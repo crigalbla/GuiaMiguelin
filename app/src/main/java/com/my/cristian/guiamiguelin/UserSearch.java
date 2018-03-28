@@ -1,0 +1,28 @@
+package com.my.cristian.guiamiguelin;
+
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.EditText;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
+public class UserSearch extends AppCompatActivity {
+
+    @BindView(R.id.search)
+    EditText search;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.user_search);
+        ButterKnife.bind(this);
+    }
+
+    // TODO hacer que busque desde la base de datos cada usuario
+    @OnClick(R.id.searchButoon)
+    public void searchOnClick() {
+
+    }
+}

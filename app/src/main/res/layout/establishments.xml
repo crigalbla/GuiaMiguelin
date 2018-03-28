@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:id="@+id/rlyEstablishment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true">
+        
+        <android.support.v7.widget.AppCompatImageView
+            android:id="@+id/imgListEstablishment"
+            android:layout_width="@dimen/img_list_size"
+            android:layout_height="@dimen/img_list_size"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_restaurant"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/nameEstablishment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre establecimiento"
+            android:maxLines="1"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:layout_margin="@dimen/pading_small"
+            android:layout_toStartOf="@+id/puntuation"
+            android:layout_toEndOf="@id/imgListEstablishment"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/adrresEstablishment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Calle del establecimiento"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_margin="@dimen/pading_small"
+            android:layout_toStartOf="@+id/puntuation"
+            android:layout_toEndOf="@id/imgListEstablishment"
+            android:layout_below="@id/nameEstablishment"/>
+
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/puntuation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_margin="@dimen/pading_small"
+            android:hint="Nota"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:drawableBottom="@drawable/ic_star"/>
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

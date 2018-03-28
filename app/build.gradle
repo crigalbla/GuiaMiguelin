@@ -1,0 +1,38 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.my.cristian.guiamiguelin"
+        minSdkVersion 20
+        targetSdkVersion 27
+        versionCode 1       // Esto es la versión para el play Store
+        versionName "1.0"   // Esto es la versión para el play Store
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-compat:27.1.0'
+    implementation 'com.android.support:design:27.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'com.android.support:cardview-v7:27.1.0'
+    implementation 'com.google.android.gms:play-services-maps:12.0.0'
+    androidTestImplementation 'com.android.tools.build:gradle:3.1.0'
+
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
+}
