@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDDKBVc9RY69TlAb32VUEUEiV_6Vu4k8vE" />
+            android:value="AIzaSyCSdhvV__KzbjUpz2XWn-N_huuSWLZyRgk" />
         <!-- Aquí se debe de añadir cada pantalla -->
         <activity
             android:name=".MainActivity"
@@ -34,8 +34,7 @@
             android:name=".Login"
             android:label="Iniciar sesión" />
         <activity
-            android:name=".GoogleMaps"
-            android:label="Google Maps"/>
+            android:name=".GoogleMaps"/>
         <activity
             android:name=".EstablishmentSearch"
             android:label="Búsqueda de establecimientos"/>
