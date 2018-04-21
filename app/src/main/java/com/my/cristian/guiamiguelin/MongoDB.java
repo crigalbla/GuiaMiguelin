@@ -28,12 +28,16 @@ public class MongoDB extends AppCompatActivity {
         switch (type){
             case("GET"):
                 new GetDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status");
+                break;
             case("POST"):
                 new PostDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status");
+                break;
             case("PUT"):
                 new PutDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status/574400cdd213dde0063a84b9");
+                break;
             case("DELETE"):
                 new DeleteDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status/5744085cd213dde0063a84ba");
+                break;
         }
     }
 
@@ -48,7 +52,7 @@ public class MongoDB extends AppCompatActivity {
             super.onPreExecute();
 
             progressDialog = new ProgressDialog(MongoDB.this);
-            progressDialog.setMessage("Loading data...");
+            progressDialog.setMessage("Cargando datos...");
             progressDialog.show();
         }
 
@@ -58,7 +62,7 @@ public class MongoDB extends AppCompatActivity {
             try {
                 return getData(params[0]);
             } catch (IOException ex) {
-                return "Network error !";
+                return "Error de conexión";
             }
         }
 
@@ -66,10 +70,10 @@ public class MongoDB extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            //set data response to textView
+            // Modificar respuesta de datos al texView
             mResult.setText(result);
 
-            //cancel progress dialog
+            // Cerrar ventana de diálogo
             if (progressDialog != null) {
                 progressDialog.dismiss();
             }
@@ -80,16 +84,16 @@ public class MongoDB extends AppCompatActivity {
             BufferedReader bufferedReader =null;
 
             try {
-                //Initialize and config request, then connect to server
+                // Iniciar, configurar solicitud y conectar al servidor
                 URL url = new URL(urlPath);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setReadTimeout(10000 /* milliseconds */);
-                urlConnection.setConnectTimeout(10000 /* milliseconds */);
+                urlConnection.setReadTimeout(10000 /* milisegundos */);
+                urlConnection.setConnectTimeout(10000 /* milisegundos */);
                 urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("Content-Type", "application/json");// set header
+                urlConnection.setRequestProperty("Content-Type", "application/json");// Cabecera de la petición
                 urlConnection.connect();
 
-                //Read data response from server
+                // Leer datos de respuesta del servidor
                 InputStream inputStream = urlConnection.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
@@ -138,11 +142,11 @@ public class MongoDB extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            mResult.setText(result);
+            // mResult.setText(result);
 
-            if (progressDialog != null) {
-                progressDialog.dismiss();
-            }
+//            if (progressDialog != null) {
+//                progressDialog.dismiss();
+//            }
         }
 
         private String postData(String urlPath) throws IOException, JSONException {
@@ -152,14 +156,14 @@ public class MongoDB extends AppCompatActivity {
             BufferedReader bufferedReader = null;
 
             try {
-                //Create data to send to server
+                // Creo datos para enviarlos al servidor
                 JSONObject dataToSend = new JSONObject();
-                dataToSend.put("fbname", "Think twice code once");
-                dataToSend.put("content", "feel good");
+                dataToSend.put("fbname", "Nomber de pruebas");
+                dataToSend.put("content", "Comentario");
                 dataToSend.put("likes", 1);
                 dataToSend.put("comments", 1);
 
-                //Initialize and config request, then connect to server.
+                // Iniciar, configurar solicitud y conectar al servidor
                 URL url = new URL(urlPath);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(10000 /* milliseconds */);
@@ -169,13 +173,13 @@ public class MongoDB extends AppCompatActivity {
                 urlConnection.setRequestProperty("Content-Type", "application/json");// set header
                 urlConnection.connect();
 
-                //Write data into server
+                // Escribo los datos en el servidor
                 OutputStream outputStream = urlConnection.getOutputStream();
                 bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
                 bufferedWriter.write(dataToSend.toString());
                 bufferedWriter.flush();
 
-                //Read data response from server
+                // Leo la respuesta del servidor
                 InputStream inputStream = urlConnection.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
@@ -205,7 +209,7 @@ public class MongoDB extends AppCompatActivity {
             super.onPreExecute();
 
             progressDialog = new ProgressDialog(MongoDB.this);
-            progressDialog.setMessage("Updating data...");
+            progressDialog.setMessage("Actualizando datos...");
             progressDialog.show();
         }
 
@@ -214,9 +218,9 @@ public class MongoDB extends AppCompatActivity {
             try {
                 return putData(params[0]);
             } catch (IOException ex) {
-                return "Network error !";
+                return "Error de conexión";
             } catch (JSONException ex) {
-                return "Data invalid !";
+                return "Datos incorrectos";
             }
 
         }
@@ -237,14 +241,14 @@ public class MongoDB extends AppCompatActivity {
             BufferedWriter bufferedWriter = null;
 
             try {
-                //Create data to update
+                // Creo los datos a actualizar
                 JSONObject dataToSend = new JSONObject();
-                dataToSend.put("fbname", "Think twice code once ! HI !");
-                dataToSend.put("content", "feel good - UPDATED !");
+                dataToSend.put("fbname", "Nombre modificado");
+                dataToSend.put("content", "comenatario modificado");
                 dataToSend.put("likes", 999);
                 dataToSend.put("comments", 999);
 
-                //Initialize and config request, then connect to server
+                // Iniciar, configurar solicitud y conectar al servidor
                 URL url = new URL(urlPath);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setReadTimeout(10000 /* milliseconds */);
@@ -254,17 +258,17 @@ public class MongoDB extends AppCompatActivity {
                 urlConnection.setRequestProperty("Content-Type", "application/json");// set header
                 urlConnection.connect();
 
-                //Write data into server
+                // Escribo los datos en el servidor
                 OutputStream outputStream = urlConnection.getOutputStream();
                 bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
                 bufferedWriter.write(dataToSend.toString());
                 bufferedWriter.flush();
 
-                //Check update successful or not
+                // Comprobar si la actuzalización ha sido correcta
                 if (urlConnection.getResponseCode() == 200) {
-                    return "Update successfully !";
+                    return "Actualización correcta";
                 } else {
-                    return "Update failed !";
+                    return "Actualización fallida";
                 }
             } finally {
                 if(bufferedWriter != null) {
@@ -284,7 +288,7 @@ public class MongoDB extends AppCompatActivity {
             super.onPreExecute();
 
             progressDialog = new ProgressDialog(MongoDB.this);
-            progressDialog.setMessage("Deleting data...");
+            progressDialog.setMessage("Borrando datos...");
             progressDialog.show();
         }
 
@@ -293,7 +297,7 @@ public class MongoDB extends AppCompatActivity {
             try {
                 return deleteData(params[0]);
             } catch (IOException ex) {
-                return "Network error !";
+                return "Error de conexión";
             }
         }
 
@@ -312,7 +316,7 @@ public class MongoDB extends AppCompatActivity {
 
             String result;
 
-            //Initialize and config request, then connect to server.
+            // Iniciar, configurar solicitud y conectar al servidor
             URL url = new URL(urlPath);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(10000 /* milliseconds */);
@@ -321,7 +325,7 @@ public class MongoDB extends AppCompatActivity {
             urlConnection.setRequestProperty("Content-Type", "application/json");// set header
             urlConnection.connect();
 
-            //Check update successful or not
+            // Comprobar si la actuzalización ha sido correcta
             if (urlConnection.getResponseCode() == 204) {
                 result = "Delete successfully !";
             } else {

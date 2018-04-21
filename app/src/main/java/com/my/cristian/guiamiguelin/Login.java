@@ -24,20 +24,11 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_in);
         ButterKnife.bind(this);
-
-//        Intent intent = getIntent();
-
     }
-
-//    @Override
-//    public void onBackPressed(){
-//        setResult(RESULT_OK);
-//        super.onBackPressed();
-//    }
 
     @OnClick(R.id.log_in)
     public void loginOnClick() {
-        new MongoDB().mongoAPI("nada", "POST");
+        new MongoDB().mongoAPI("nada", "POST"); // Prueba para el servidor heroku
         Intent i = new Intent(Login.this, MainActivity.class);
         startActivity(i);
     }
