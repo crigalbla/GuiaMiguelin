@@ -41,6 +41,9 @@
         <activity
             android:name=".UserSearch"
             android:label="Búsqueda de usuarios"/>
+        <activity
+            android:name=".MongoDB"
+            android:label="MongoDB"/>
     </application>
 
 </manifest>

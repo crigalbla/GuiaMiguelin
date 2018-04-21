@@ -37,6 +37,7 @@ public class Login extends AppCompatActivity {
 
     @OnClick(R.id.log_in)
     public void loginOnClick() {
+        new MongoDB().mongoAPI("nada", "POST");
         Intent i = new Intent(Login.this, MainActivity.class);
         startActivity(i);
     }

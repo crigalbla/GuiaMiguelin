@@ -16,19 +16,19 @@
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_map_black"
             android:title="Google Maps" />
-    </group>
 
-    <item android:title="Buscar:">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_person_black"
-                android:title="Usuarios" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/cup"
-                android:title="Establecimientos" />
-        </menu>
-    </item>
+        <item android:title="Buscar:">
+            <menu>
+                <item
+                    android:id="@+id/nav_share"
+                    android:icon="@drawable/ic_person_black"
+                    android:title="Usuarios" />
+                <item
+                    android:id="@+id/nav_send"
+                    android:icon="@drawable/cup"
+                    android:title="Establecimientos" />
+            </menu>
+        </item>
+    </group>
 
 </menu>
