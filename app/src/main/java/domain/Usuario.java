@@ -1,4 +1,4 @@
-package com.my.cristian.guiamiguelin;
+package domain;
 
 /**
  * Created by Cristian on 02/03/2018.

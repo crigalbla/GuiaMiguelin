@@ -5,27 +5,36 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/profile"
+            android:icon="@drawable/ic_person_black"
+            android:title="Mi perfil" />
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/ic_lock"
+            android:title="Cerrar sesión" />
+
+        <item
+            android:id="@+id/principal"
             android:icon="@drawable/ic_home_black"
             android:title="Página principal" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/login"
             android:icon="@drawable/ic_power_black"
             android:title="Iniciar sesión" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/maps"
             android:icon="@drawable/ic_map_black"
             android:title="Google Maps" />
 
         <item android:title="Buscar:">
             <menu>
                 <item
-                    android:id="@+id/nav_share"
-                    android:icon="@drawable/ic_person_black"
+                    android:id="@+id/search_user"
+                    android:icon="@drawable/ic_search"
                     android:title="Usuarios" />
                 <item
-                    android:id="@+id/nav_send"
-                    android:icon="@drawable/cup"
+                    android:id="@+id/search_estab"
+                    android:icon="@drawable/ic_search"
                     android:title="Establecimientos" />
             </menu>
         </item>

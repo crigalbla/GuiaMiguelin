@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!-- Para la localización por red movil -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Para consultar el estado de la red -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <!-- Para escribir datos cartográficos temporales en el almacenamiento externo -->
     <!-- <uses-permission android:name="android.permission.LOCATION_HARDWARE" /> -->
     <application
@@ -27,23 +28,26 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".Login"
             android:label="Iniciar sesión" />
-        <activity
-            android:name=".GoogleMaps"/>
+        <activity android:name=".GoogleMaps" />
         <activity
             android:name=".EstablishmentSearch"
-            android:label="Búsqueda de establecimientos"/>
+            android:label="Búsqueda de establecimientos" />
         <activity
             android:name=".UserSearch"
-            android:label="Búsqueda de usuarios"/>
+            android:label="Búsqueda de usuarios" />
         <activity
             android:name=".MongoDB"
-            android:label="MongoDB"/>
+            android:label="MongoDB" />
+        <activity android:name=".Profile" />
+        <activity android:name=".EditProfile" />
+        <activity android:name=".ShowEstablishment"></activity>
     </application>
 
 </manifest>

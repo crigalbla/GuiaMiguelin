@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import domain.Restaurante;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnItemClickListener {
@@ -107,10 +108,10 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
+        // Esto son los 3 puntitos desplegables del menú
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -121,18 +122,25 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Intent i = null;
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.profile) {
+            i = new Intent(MainActivity.this, Profile.class);
+        } else if (id == R.id.logout) {
+            // TODO
+        } else if (id == R.id.principal) {
+            i = new Intent(MainActivity.this, MainActivity.class);
+        } else if (id == R.id.login) {
+            i = new Intent(MainActivity.this, Login.class);
+        } else if (id == R.id.maps) {
+            i = new Intent(MainActivity.this, GoogleMaps.class);
+        } else if (id == R.id.search_user) {
+            i = new Intent(MainActivity.this, UserSearch.class);
+        } else if (id == R.id.search_estab) {
+            i = new Intent(MainActivity.this, EstablishmentSearch.class);
         }
+        if (i != null)
+            startActivity(i);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

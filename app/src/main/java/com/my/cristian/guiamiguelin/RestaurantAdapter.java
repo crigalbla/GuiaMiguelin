@@ -13,6 +13,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import domain.Restaurante;
 
 /**
  * Created by Cristian on 02/03/2018.

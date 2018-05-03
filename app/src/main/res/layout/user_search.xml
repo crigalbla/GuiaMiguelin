@@ -26,7 +26,7 @@
                 android:layout_margin="@dimen/pading_medium"
                 android:ems="12"
                 android:inputType="text"
-                android:hint="Search user" />
+                android:hint="Buscar usuario" />
 
             <Button
                 android:id="@+id/searchButoon"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:theme="@style/buttons"
-                android:text="Search" />
+                android:text="Buscar" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycle"
