@@ -3,7 +3,6 @@ package com.my.cristian.guiamiguelin;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -47,9 +46,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         // Para modificar el include de cada drawer
-        String strIncludeId = "include";
-        int includeId = getResources().getIdentifier(strIncludeId,"id", getPackageName());
-        CoordinatorLayout texto = (CoordinatorLayout) drawer.findViewById(includeId);
+//        String strIncludeId = "include";
+//        int includeId = getResources().getIdentifier(strIncludeId,"id", getPackageName());
+//        CoordinatorLayout texto = (CoordinatorLayout) drawer.findViewById(includeId);
 
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(

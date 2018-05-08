@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,6 +29,8 @@ public class Login extends AppCompatActivity
     EditText passaword;
     @BindView(R.id.log_in)
     Button logIn;
+    @BindView(R.id.textRegister)
+    TextView textRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +96,12 @@ public class Login extends AppCompatActivity
     public void loginOnClick() {
         new MongoDB().mongoAPI("nada", "POST"); // Prueba para el servidor heroku
         Intent i = new Intent(Login.this, MainActivity.class);
+        startActivity(i);
+    }
+
+    @OnClick(R.id.textRegister)
+    public void onViewClicked() {
+        Intent i = new Intent(Login.this, Register.class);
         startActivity(i);
     }
 }

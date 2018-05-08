@@ -41,6 +41,8 @@ public class MongoDB extends AppCompatActivity {
         }
     }
 
+    // GET -----------------------------------------------------------------------------------------
+
     @SuppressLint("StaticFieldLeak")
     class GetDataTask extends AsyncTask<String, Void, String> {
 
@@ -110,6 +112,8 @@ public class MongoDB extends AppCompatActivity {
             return result.toString();
         }
     }
+
+    // POST ----------------------------------------------------------------------------------------
 
     @SuppressLint("StaticFieldLeak")
     class PostDataTask extends AsyncTask<String, Void, String> {
@@ -199,6 +203,8 @@ public class MongoDB extends AppCompatActivity {
         }
     }
 
+    // PUT -----------------------------------------------------------------------------------------
+
     @SuppressLint("StaticFieldLeak")
     class PutDataTask extends AsyncTask<String, Void, String> {
 
@@ -277,6 +283,8 @@ public class MongoDB extends AppCompatActivity {
             }
         }
     }
+
+    // DELETE --------------------------------------------------------------------------------------
 
     @SuppressLint("StaticFieldLeak")
     class DeleteDataTask extends AsyncTask<String, Void, String> {

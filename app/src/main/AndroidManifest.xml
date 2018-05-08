@@ -47,7 +47,8 @@
             android:label="MongoDB" />
         <activity android:name=".Profile" />
         <activity android:name=".EditProfile" />
-        <activity android:name=".ShowEstablishment"></activity>
+        <activity android:name=".ShowEstablishment" />
+        <activity android:name=".Register"></activity>
     </application>
 
 </manifest>
