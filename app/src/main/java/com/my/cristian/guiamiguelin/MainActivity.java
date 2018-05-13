@@ -19,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import domain.Restaurante;
+import domain.TipoRestaurante;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnItemClickListener {
@@ -29,12 +30,20 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recycle;
 
     private RestaurantAdapter adapter;
+    private MongoAdapter adapter2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        // Obtener instancia de la lista
+        recycle = (RecyclerView) findViewById(R.id.recycle);
+
+        // Crear y setear adaptador
+        adapter2 = new MongoAdapter(this);
+//        recycle.setAdapter(adapter2);
 
         configToobar();
         configAdapter();
@@ -164,7 +173,8 @@ public class MainActivity extends AppCompatActivity
 
         for (int i = 0; i < 4; i++) {
             Restaurante restaurante = new Restaurante(nombres[i], direcciones[i], latitudes[i],
-                    longitudes[i], cierres[i], aperturas[i], telefonos[i], notasMedia[i]);
+                    longitudes[i], cierres[i], aperturas[i], telefonos[i], notasMedia[i],
+                    TipoRestaurante.BUFFET);
             adapter.add(restaurante);
         }
     }

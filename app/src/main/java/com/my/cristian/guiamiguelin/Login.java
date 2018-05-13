@@ -94,7 +94,7 @@ public class Login extends AppCompatActivity
 
     @OnClick(R.id.log_in)
     public void loginOnClick() {
-        new MongoDB().mongoAPI("nada", "POST"); // Prueba para el servidor heroku
+        new MongoDB().mongoAPI("/status", "POST", this); // Prueba para el servidor heroku
         Intent i = new Intent(Login.this, MainActivity.class);
         startActivity(i);
     }

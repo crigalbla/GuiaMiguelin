@@ -10,19 +10,19 @@ public class Establecimiento {
     private String direccion;
     private double latitud;
     private double longitud;
-    private String cierre;
     private String apertura;
+    private String cierre;
     private int telefono;
     private double notaMedia;
 
     public Establecimiento(String nombre, String direccion, double latitud, double longitud,
-                           String cierre, String apertura, int telefono, double notaMedia) {
+                           String apertura, String cierre, int telefono, double notaMedia) {
         this.nombre = nombre;
         this.direccion = direccion;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.cierre = cierre;
         this.apertura = apertura;
+        this.cierre = cierre;
         this.telefono = telefono;
         this.notaMedia = notaMedia;
     }

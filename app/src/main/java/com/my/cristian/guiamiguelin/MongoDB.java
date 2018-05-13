@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,22 +20,25 @@ import java.net.URL;
 
 public class MongoDB extends AppCompatActivity {
 
-    private TextView mResult;
+//    private TextView mResult;
+    private AppCompatActivity activity;
+    private static final String URL_BASE = "https://api-rest-guia-miguelin-tfg.herokuapp.com/api";
 
-    public void mongoAPI(String url, String type){
+    public void mongoAPI(String url, String type, AppCompatActivity activity){
+        this.activity = activity;
         // Local http://192.168.1.106:1234/
         switch (type){
             case("GET"):
-                new GetDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status");
+                new GetDataTask().execute(URL_BASE + url);
                 break;
             case("POST"):
-                new PostDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status");
+                new PostDataTask().execute(URL_BASE + url);
                 break;
             case("PUT"):
-                new PutDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status/574400cdd213dde0063a84b9");
+                new PutDataTask().execute(URL_BASE + "/status/574400cdd213dde0063a84b9");
                 break;
             case("DELETE"):
-                new DeleteDataTask().execute("https://api-rest-guia-miguelin-tfg.herokuapp.com/api/status/5744085cd213dde0063a84ba");
+                new DeleteDataTask().execute(URL_BASE + "/status/5744085cd213dde0063a84ba");
                 break;
         }
     }
@@ -50,10 +52,9 @@ public class MongoDB extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(MongoDB.this);
+            progressDialog = new ProgressDialog(activity);
             progressDialog.setMessage("Cargando datos...");
             progressDialog.show();
         }
@@ -73,7 +74,7 @@ public class MongoDB extends AppCompatActivity {
             super.onPostExecute(result);
 
             // Modificar respuesta de datos al texView
-            mResult.setText(result);
+//            mResult.setText(result);
 
             // Cerrar ventana de diálogo
             if (progressDialog != null) {
@@ -125,9 +126,9 @@ public class MongoDB extends AppCompatActivity {
             super.onPreExecute();
 
             // Esto no es mas que una ventana que dice el proceso de la tarea
-//            progressDialog = new ProgressDialog(MongoDB.this);
-//            progressDialog.setMessage("Inserting data...");
-//            progressDialog.show();
+            progressDialog = new ProgressDialog(activity);
+            progressDialog.setMessage("Inserting data...");
+            progressDialog.show();
         }
 
         @Override
@@ -148,9 +149,9 @@ public class MongoDB extends AppCompatActivity {
 
             // mResult.setText(result);
 
-//            if (progressDialog != null) {
-//                progressDialog.dismiss();
-//            }
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
         }
 
         private String postData(String urlPath) throws IOException, JSONException {
@@ -235,7 +236,7 @@ public class MongoDB extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            mResult.setText(result);
+//            mResult.setText(result);
 
             if (progressDialog != null) {
                 progressDialog.dismiss();
@@ -313,7 +314,7 @@ public class MongoDB extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            mResult.setText(result);
+//            mResult.setText(result);
 
             if(progressDialog != null) {
                 progressDialog.dismiss();
