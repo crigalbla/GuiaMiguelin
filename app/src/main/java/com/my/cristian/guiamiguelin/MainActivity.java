@@ -18,8 +18,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import domain.Restaurante;
-import domain.TipoRestaurante;
+import domain.Restaurant;
+import domain.Review;
+import domain.TypeRestaurant;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnItemClickListener {
@@ -138,12 +139,12 @@ public class MainActivity extends AppCompatActivity
     // Métodos auxiliares --------------------------------------------------------------------------
 
     @Override
-    public void onItemClick(Restaurante restaurante) {
+    public void onItemClick(Restaurant restaurante) {
 
     }
 
     @Override
-    public void onLongItemClick(Restaurante restaurante) {
+    public void onLongItemClick(Restaurant restaurante) {
 
     }
 
@@ -152,7 +153,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void configAdapter() {
-        adapter = new RestaurantAdapter(new ArrayList<Restaurante>(), this);
+        adapter = new RestaurantAdapter(new ArrayList<Restaurant>(), this);
     }
 
     private void configReclyclerView() {
@@ -172,9 +173,9 @@ public class MainActivity extends AppCompatActivity
         double[] notasMedia = {5.0, 4.7, 2.3, 4.8};
 
         for (int i = 0; i < 4; i++) {
-            Restaurante restaurante = new Restaurante(nombres[i], direcciones[i], latitudes[i],
-                    longitudes[i], cierres[i], aperturas[i], telefonos[i], notasMedia[i],
-                    TipoRestaurante.BUFFET);
+            Restaurant restaurante = new Restaurant(nombres[i], direcciones[i],
+                    "descripción", latitudes[i], longitudes[i], cierres[i], aperturas[i],
+                    telefonos[i], notasMedia[i], new ArrayList<Review>(), null, TypeRestaurant.BUFFET);
             adapter.add(restaurante);
         }
     }

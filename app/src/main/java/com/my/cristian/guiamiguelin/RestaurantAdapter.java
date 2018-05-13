@@ -13,7 +13,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import domain.Restaurante;
+import domain.Restaurant;
 
 /**
  * Created by Cristian on 02/03/2018.
@@ -21,11 +21,11 @@ import domain.Restaurante;
 
 public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolder> {
 
-    private List<Restaurante> restaurantes;
+    private List<Restaurant> restaurantes;
     private Context context;
     private OnItemClickListener listener;
 
-    public RestaurantAdapter(List<Restaurante> restaurantes, OnItemClickListener listener) {
+    public RestaurantAdapter(List<Restaurant> restaurantes, OnItemClickListener listener) {
         this.restaurantes = restaurantes;
         this.listener = listener;
     }
@@ -40,13 +40,13 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Restaurante restaurante = restaurantes.get(position);
+        final Restaurant restaurante = restaurantes.get(position);
 
         holder.setListener(restaurante, listener);
 
-        holder.nameEstablishment.setText(restaurante.getNombre());
-        holder.adrresEstablishment.setText(restaurante.getDireccion());
-        holder.puntuation.setText(String.valueOf(restaurante.getNotaMedia()));
+        holder.nameEstablishment.setText(restaurante.getName());
+        holder.adrresEstablishment.setText(restaurante.getAddress());
+        holder.puntuation.setText(String.valueOf(restaurante.getAverage()));
 
     }
 
@@ -55,7 +55,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
         return this.restaurantes.size();
     }
 
-    public void add(Restaurante restaurante) {
+    public void add(Restaurant restaurante) {
         if (!restaurantes.contains(restaurante)) {
             restaurantes.add(restaurante);
             notifyDataSetChanged();
@@ -80,7 +80,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
             ButterKnife.bind(this, itemView);
         }
 
-        void setListener(final Restaurante restaurante, final OnItemClickListener listener) {
+        void setListener(final Restaurant restaurante, final OnItemClickListener listener) {
             rlyEstablishment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

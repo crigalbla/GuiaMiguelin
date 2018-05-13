@@ -1,5 +1,5 @@
 package domain;
 
-public enum TipoBar {
+public enum TypePub {
     TAPAS, VINOS, CHIRINGUITO, TERRAZA, PUB, CERVECERÍA, CAFETERÍA, COCTELERÍA, OTRO
 }

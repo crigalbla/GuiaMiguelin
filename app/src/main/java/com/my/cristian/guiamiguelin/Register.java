@@ -6,10 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import domain.Usuario;
+import domain.User;
 
 public class Register extends AppCompatActivity {
 
@@ -47,7 +49,7 @@ public class Register extends AppCompatActivity {
 
     @OnClick(R.id.send)
     public void onViewClicked() {
-        // TODO comprar si se ha registrado y poner un mensajito
+        // TODO comprobar si se ha registrado y poner un mensajito
         String textNick = nick.getText().toString();
         String textPassword = passaword.getText().toString();
         String textVeryPassoword = verifyPassword.getText().toString();
@@ -59,11 +61,11 @@ public class Register extends AppCompatActivity {
         String textEmail = email.getText().toString();
         Integer textTelephone = (telephone.getText().toString().length() > 0)? new Integer(telephone.getText().toString()) : null;
 
-        Usuario usuario = new Usuario(nick.getText().toString(),  passaword.getText().toString(),
+        User usuario = new User(nick.getText().toString(),  passaword.getText().toString(),
                 name.getText().toString(), surnames.getText().toString(),
                 description.getText().toString(), pleasures.getText().toString(),
                 city.getText().toString(), email.getText().toString(),
-                textTelephone);
+                textTelephone, new ArrayList<User>(), null);
         Intent i = new Intent(Register.this, Login.class);
         startActivity(i);
     }
