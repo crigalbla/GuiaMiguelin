@@ -65,7 +65,7 @@ public class Register extends AppCompatActivity {
                 name.getText().toString(), surnames.getText().toString(),
                 description.getText().toString(), pleasures.getText().toString(),
                 city.getText().toString(), email.getText().toString(),
-                textTelephone, new ArrayList<User>(), null);
+                textTelephone, new ArrayList<String>(), new ArrayList<String>());
         Intent i = new Intent(Register.this, Login.class);
         startActivity(i);
     }

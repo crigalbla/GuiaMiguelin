@@ -8,14 +8,23 @@ public class Review {
 
     private int puntuation;
     private String comment;
-    private User author;
-    private Establishment establishment;
+    private String author;
+    private String establishment;
 
-    public Review(int puntuation, String comment, User author, Establishment establishment) {
+    public Review(int puntuation, String comment, String author, String establishment) {
         this.puntuation = puntuation;
         this.comment = comment;
         this.author = author;
         this.establishment = establishment;
+    }
+
+    public Review(int puntuation, String comment) {
+        this.puntuation = puntuation;
+        this.comment = comment;
+    }
+
+    public Review() {
+
     }
 
     public int getPuntuation() {
@@ -34,19 +43,19 @@ public class Review {
         this.comment = comment;
     }
 
-    public User getAuthor() {
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(User author) {
+    public void setAuthor(String author) {
         this.author = author;
     }
 
-    public Establishment getEstablishment() {
+    public String getEstablishment() {
         return establishment;
     }
 
-    public void setEstablishment(Establishment establishment) {
+    public void setEstablishment(String establishment) {
         this.establishment = establishment;
     }
 }

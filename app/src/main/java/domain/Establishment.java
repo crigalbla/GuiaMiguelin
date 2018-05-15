@@ -17,12 +17,12 @@ public class Establishment {
     private String closing;
     private int phone;
     private double average;
-    private List<Review> reviews;
-    private Carte carte;
+    private List<String> reviews;
+    private String carte;
 
     public Establishment(String name, String address, String description, double latitud,
                          double longitud, String opening, String closing, int phone,
-                         double average, List<Review> reviews, Carte carte) {
+                         double average, List<String> reviews, String carte) {
         this.name = name;
         this.address = address;
         this.description = description;
@@ -34,6 +34,24 @@ public class Establishment {
         this.average = average;
         this.reviews = reviews;
         this.carte = carte;
+    }
+
+    public Establishment(String name, String address, String description, double latitud,
+                         double longitud, String opening, String closing, int phone,
+                         double average) {
+        this.name = name;
+        this.address = address;
+        this.description = description;
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.opening = opening;
+        this.closing = closing;
+        this.phone = phone;
+        this.average = average;
+    }
+
+    public Establishment(){
+
     }
 
     public String getName() {
@@ -108,19 +126,19 @@ public class Establishment {
         this.average = average;
     }
 
-    public List<Review> getReviews() {
+    public List<String> getReviews() {
         return reviews;
     }
 
-    public void setReviews(List<Review> reviews) {
+    public void setReviews(List<String> reviews) {
         this.reviews = reviews;
     }
 
-    public Carte getCarte() {
+    public String getCarte() {
         return carte;
     }
 
-    public void setCarte(Carte carte) {
+    public void setCarte(String carte) {
         this.carte = carte;
     }
 }

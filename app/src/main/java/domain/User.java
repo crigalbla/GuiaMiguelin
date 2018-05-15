@@ -17,12 +17,12 @@ public class User {
     private String city;
     private String email;
     private Integer phone;
-    private List<User> followeds;
-    private List<Review> reviews;
+    private List<String> followeds;
+    private List<String> reviews;
 
     public User(String nick, String passaword, String name, String surname, String description,
-                String pleasures, String city, String email, Integer phone, List<User> followeds,
-                List<Review> reviews) {
+                String pleasures, String city, String email, Integer phone, List<String> followeds,
+                List<String> reviews) {
         this.nick = nick;
         this.passaword = passaword;
         this.name = name;
@@ -34,6 +34,19 @@ public class User {
         this.phone = phone;
         this.followeds = followeds;
         this.reviews = reviews;
+    }
+
+    public User(String nick, String passaword, String name, String surname, String description,
+                String pleasures, String city, String email, Integer phone) {
+        this.nick = nick;
+        this.passaword = passaword;
+        this.name = name;
+        this.surname = surname;
+        this.description = description;
+        this.pleasures = pleasures;
+        this.city = city;
+        this.email = email;
+        this.phone = phone;
     }
 
     public User(){
@@ -112,19 +125,19 @@ public class User {
         this.phone = phone;
     }
 
-    public List<User> getFolloweds() {
+    public List<String> getFolloweds() {
         return followeds;
     }
 
-    public void setFolloweds(List<User> followeds) {
+    public void setFolloweds(List<String> followeds) {
         this.followeds = followeds;
     }
 
-    public List<Review> getReviews() {
+    public List<String> getReviews() {
         return reviews;
     }
 
-    public void setReviews(List<Review> reviews) {
+    public void setReviews(List<String> reviews) {
         this.reviews = reviews;
     }
 }

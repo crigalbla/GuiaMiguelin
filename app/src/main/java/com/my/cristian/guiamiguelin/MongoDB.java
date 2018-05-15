@@ -20,7 +20,6 @@ import java.net.URL;
 
 public class MongoDB extends AppCompatActivity {
 
-//    private TextView mResult;
     private AppCompatActivity activity;
     private static final String URL_BASE = "https://api-rest-guia-miguelin-tfg.herokuapp.com/api";
 
@@ -73,8 +72,7 @@ public class MongoDB extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            // Modificar respuesta de datos al texView
-//            mResult.setText(result);
+            // Usar result
 
             // Cerrar ventana de diálogo
             if (progressDialog != null) {

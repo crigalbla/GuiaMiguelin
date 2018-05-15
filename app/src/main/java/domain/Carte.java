@@ -8,27 +8,31 @@ import java.util.List;
 
 public class Carte {
 
-    private Establishment establishment;
-    private List<Product> products;
+    private String establishment;
+    private List<String> products;
 
-    public Carte(Establishment establishment, List<Product> products){
+    public Carte(String establishment, List<String> products){
         this.establishment = establishment;
         this.products = products;
     }
 
-    public Establishment getEstablishment() {
+    public Carte(){
+        
+    }
+
+    public String getEstablishment() {
         return establishment;
     }
 
-    public void setEstablishment(Establishment establishment) {
+    public void setEstablishment(String establishment) {
         this.establishment = establishment;
     }
 
-    public List<Product> getProducts() {
+    public List<String> getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(List<String> products) {
         this.products = products;
     }
 }

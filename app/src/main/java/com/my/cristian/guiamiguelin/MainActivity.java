@@ -31,20 +31,12 @@ public class MainActivity extends AppCompatActivity
     RecyclerView recycle;
 
     private RestaurantAdapter adapter;
-    private MongoAdapter adapter2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        // Obtener instancia de la lista
-        recycle = (RecyclerView) findViewById(R.id.recycle);
-
-        // Crear y setear adaptador
-        adapter2 = new MongoAdapter(this);
-//        recycle.setAdapter(adapter2);
 
         configToobar();
         configAdapter();

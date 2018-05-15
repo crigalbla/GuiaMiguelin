@@ -10,15 +10,25 @@ public class Product {
     private double price;
     private String typeFood;
     private String typeDrink;
-    private Carte carte;
+    private String carte;
 
-    public Product(String name, double price, String typeFood, String typeDrink,
-                   Carte carte) {
+    public Product(String name, double price, String typeFood, String typeDrink, String carte) {
         this.name = name;
         this.price = price;
         this.typeFood = typeFood;
         this.typeDrink = typeDrink;
         this.carte = carte;
+    }
+
+    public Product(String name, double price, String typeFood, String typeDrink) {
+        this.name = name;
+        this.price = price;
+        this.typeFood = typeFood;
+        this.typeDrink = typeDrink;
+    }
+
+    public Product(){
+
     }
 
     public String getName() {
@@ -53,11 +63,11 @@ public class Product {
         this.typeDrink = typeDrink;
     }
 
-    public Carte getCarte() {
+    public String getCarte() {
         return carte;
     }
 
-    public void setCarte(Carte carte) {
+    public void setCarte(String carte) {
         this.carte = carte;
     }
 }
