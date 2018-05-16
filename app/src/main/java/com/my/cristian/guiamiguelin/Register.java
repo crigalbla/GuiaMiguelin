@@ -61,7 +61,7 @@ public class Register extends AppCompatActivity {
         String textEmail = email.getText().toString();
         Integer textTelephone = (telephone.getText().toString().length() > 0)? new Integer(telephone.getText().toString()) : null;
 
-        User usuario = new User(nick.getText().toString(),  passaword.getText().toString(),
+        User usuario = new User("_id", nick.getText().toString(),  passaword.getText().toString(),
                 name.getText().toString(), surnames.getText().toString(),
                 description.getText().toString(), pleasures.getText().toString(),
                 city.getText().toString(), email.getText().toString(),

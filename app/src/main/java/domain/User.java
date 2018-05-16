@@ -8,6 +8,7 @@ import java.util.List;
 
 public class User {
 
+    private String _id;
     private String nick;
     private String passaword;
     private String name;
@@ -20,9 +21,10 @@ public class User {
     private List<String> followeds;
     private List<String> reviews;
 
-    public User(String nick, String passaword, String name, String surname, String description,
-                String pleasures, String city, String email, Integer phone, List<String> followeds,
-                List<String> reviews) {
+    public User(String _id, String nick, String passaword, String name, String surname,
+                String description, String pleasures, String city, String email, Integer phone,
+                List<String> followeds, List<String> reviews) {
+        this._id = _id;
         this.nick = nick;
         this.passaword = passaword;
         this.name = name;
@@ -36,8 +38,9 @@ public class User {
         this.reviews = reviews;
     }
 
-    public User(String nick, String passaword, String name, String surname, String description,
-                String pleasures, String city, String email, Integer phone) {
+    public User(String _id, String nick, String passaword, String name, String surname,
+                String description, String pleasures, String city, String email, Integer phone) {
+        this._id = _id;
         this.nick = nick;
         this.passaword = passaword;
         this.name = name;
@@ -51,6 +54,14 @@ public class User {
 
     public User(){
 
+    }
+
+    public String getId() {
+        return _id;
+    }
+
+    public void setId(String _id) {
+        this._id = _id;
     }
 
     public String getNick() {

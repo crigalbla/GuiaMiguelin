@@ -19,7 +19,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import domain.Restaurant;
-import domain.Review;
 import domain.TypeRestaurant;
 
 public class MainActivity extends AppCompatActivity
@@ -108,7 +107,10 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.profile) {
             i = new Intent(MainActivity.this, Profile.class);
         } else if (id == R.id.logout) {
-            // TODO
+            Preferences.savePreferenceString(MainActivity.this, "",
+                    Preferences.PREFERENCE_USER_LOGIN);
+            Preferences.savePreferenceBoolean(MainActivity.this, false,
+                    Preferences.PREFERENCE_STATE_BUTTON_SESION);
         } else if (id == R.id.principal) {
             i = new Intent(MainActivity.this, MainActivity.class);
         } else if (id == R.id.login) {
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < 4; i++) {
             Restaurant restaurante = new Restaurant(nombres[i], direcciones[i],
                     "descripción", latitudes[i], longitudes[i], cierres[i], aperturas[i],
-                    telefonos[i], notasMedia[i], new ArrayList<Review>(), null, TypeRestaurant.BUFFET);
+                    telefonos[i], notasMedia[i], new ArrayList<String>(), null, TypeRestaurant.BUFFET);
             adapter.add(restaurante);
         }
     }

@@ -66,6 +66,15 @@
             android:inputType="textPassword"
             android:hint="Contraseña"/>
 
+        <RadioButton
+            android:id="@+id/KeepSesion"
+            android:hint="Mantener sesión iniciada"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColorHint="#000000"
+            android:layout_marginTop="@dimen/pading_small"/>
+
         <Button
             android:id="@+id/log_in"
             android:layout_width="wrap_content"
