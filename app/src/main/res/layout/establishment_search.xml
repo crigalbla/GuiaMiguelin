@@ -8,7 +8,6 @@
     app:cardUseCompatPadding="true"
     tools:context=".EstablishmentSearch">
 
-    <!-- TODO terminar-->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -19,30 +18,76 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/pading_medium"
-                android:ems="12"
-                android:inputType="text"
-                android:hint="Buscar establecimiento" />
-
-            <Button
-                android:id="@+id/searchButoon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:theme="@style/buttons"
-                android:text="Buscar" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/establishments">
+                android:orientation="horizontal"
+                android:gravity="center">
 
-            </android.support.v7.widget.RecyclerView>
+                <EditText
+                    android:id="@+id/search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/pading_medium"
+                    android:layout_marginTop="@dimen/pading_medium"
+                    android:layout_marginLeft="@dimen/pading_medium"
+                    android:ems="12"
+                    android:inputType="text"
+                    android:hint="Buscar establecimiento" />
+
+                <Button
+                    android:id="@+id/searchButoon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginRight="@dimen/pading_medium"
+                    android:theme="@style/buttons"
+                    android:text="Buscar" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bares"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <ScrollView
+                android:layout_width="400dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/pading_medium">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recyclePubs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/establishments">
+
+                </android.support.v7.widget.RecyclerView>
+            </ScrollView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Restaurantes"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+            <ScrollView
+                android:layout_width="400dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycleRestaurants"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:listitem="@layout/establishments">
+
+                </android.support.v7.widget.RecyclerView>
+            </ScrollView>
+
         </LinearLayout>
     </ScrollView>
 

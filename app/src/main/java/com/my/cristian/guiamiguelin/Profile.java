@@ -60,6 +60,8 @@ public class Profile extends AppCompatActivity {
                 Preferences.PREFERENCE_USER_LOGIN), "GET");
     }
 
+    // Botones -------------------------------------------------------------------------------------
+
     @OnClick(R.id.BTedit)
     public void goToEdit() {
         Intent i = new Intent(Profile.this, EditProfile.class);
