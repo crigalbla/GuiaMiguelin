@@ -23,31 +23,17 @@
             android:layout_width="match_parent"
             android:layout_height="164dp"
             android:contentDescription="Logo"
-            app:srcCompat="@mipmap/logo" />
+            app:srcCompat="@mipmap/logo"
+            android:paddingBottom="@dimen/pading_medium"/>
 
-        <Button
-            android:id="@+id/iniciarSesion"
-            android:layout_width="wrap_content"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Iniciar sesión"
-            android:theme="@style/buttons" />
+            android:background="@drawable/border"
+            tools:listitem="@layout/establishments">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/establishments">
-
-            </android.support.v7.widget.RecyclerView>
-
-        <Button
-            android:id="@+id/maps"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Google Maps"
-            android:theme="@style/buttons" />
+        </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
     </ScrollView>

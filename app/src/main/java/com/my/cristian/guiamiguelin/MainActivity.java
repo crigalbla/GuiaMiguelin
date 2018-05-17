@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -38,21 +39,13 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        configToobar();
         configAdapter();
         configReclyclerView();
-
         generateRestaurant();
 
-        // Todoo esto es para el desplegable
+        // Esto es el desplegable
+        configToobar();
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
-
-        // Para modificar el include de cada drawer
-//        String strIncludeId = "include";
-//        int includeId = getResources().getIdentifier(strIncludeId,"id", getPackageName());
-//        CoordinatorLayout texto = (CoordinatorLayout) drawer.findViewById(includeId);
-
-
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -73,29 +66,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // Menú de los 3 puntitos
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-
-    // Deplegable de los 3 puntitos
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        // Esto son los 3 puntitos desplegables del menú
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+    // Para nombrar el action bar
+    private void configToobar() {
+        setSupportActionBar(toolbar);
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -107,6 +81,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.profile) {
             i = new Intent(MainActivity.this, Profile.class);
+        } else if (id == R.id.login) {
+            i = new Intent(MainActivity.this, Login.class);
         } else if (id == R.id.logout) {
             Preferences.savePreferenceString(MainActivity.this, "",
                     Preferences.PREFERENCE_USER_LOGIN);
@@ -114,8 +90,6 @@ public class MainActivity extends AppCompatActivity
                     Preferences.PREFERENCE_STATE_BUTTON_SESION);
         } else if (id == R.id.principal) {
             i = new Intent(MainActivity.this, MainActivity.class);
-        } else if (id == R.id.login) {
-            i = new Intent(MainActivity.this, Login.class);
         } else if (id == R.id.maps) {
             i = new Intent(MainActivity.this, GoogleMaps.class);
         } else if (id == R.id.search_user) {
@@ -135,16 +109,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(Establishment establishment) {
-
+        Toast.makeText(MainActivity.this,"Acabas de pulsar en un establecimiento",
+                Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onLongItemClick(Establishment establishment) {
-
-    }
-
-    private void configToobar() {
-        setSupportActionBar(toolbar);
+    public void onItemLongClick(Establishment establishment) {
+        Toast.makeText(MainActivity.this,"Acabas de dejar pulsado un establecimiento",
+                Toast.LENGTH_LONG).show();
     }
 
     private void configAdapter() {
@@ -177,21 +149,9 @@ public class MainActivity extends AppCompatActivity
 
     // Botones -------------------------------------------------------------------------------------
 
-    @OnClick(R.id.maps)
-    public void goToMaps() {
-        Intent i = new Intent(MainActivity.this, GoogleMaps.class);
-        startActivity(i);
-    }
-
     @OnClick(R.id.fab)
     public void goToMapsFloat() {
         Intent i = new Intent(MainActivity.this, GoogleMaps.class);
-        startActivity(i);
-    }
-
-    @OnClick(R.id.iniciarSesion)
-    public void goToLogin() {
-        Intent i = new Intent(MainActivity.this, Login.class);
         startActivity(i);
     }
 }

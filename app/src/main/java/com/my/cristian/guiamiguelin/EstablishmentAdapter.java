@@ -46,7 +46,11 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
 
         holder.nameEstablishment.setText(establishment.getName());
         holder.adrresEstablishment.setText(establishment.getAddress());
-        holder.puntuation.setText(String.valueOf(establishment.getAverage()));
+        if(establishment.getReviews().size() > 0) {
+            holder.puntuation.setText(String.valueOf(establishment.getAverage()));
+        }else {
+            holder.puntuation.setText("N/A");
+        }
 
     }
 

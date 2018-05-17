@@ -54,7 +54,7 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
     }
 
     @Override
-    public void onLongItemClick(User user) {
+    public void onItemLongClick(User user) {
 
     }
 

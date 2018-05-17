@@ -65,7 +65,7 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
     }
 
     @Override
-    public void onLongItemClick(Establishment establishment) {
+    public void onItemLongClick(Establishment establishment) {
 
     }
 

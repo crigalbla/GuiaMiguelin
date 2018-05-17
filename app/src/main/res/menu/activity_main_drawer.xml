@@ -9,6 +9,10 @@
             android:icon="@drawable/ic_person_black"
             android:title="Mi perfil" />
         <item
+            android:id="@+id/login"
+            android:icon="@drawable/ic_power_black"
+            android:title="Iniciar sesión" />
+        <item
             android:id="@+id/logout"
             android:icon="@drawable/ic_lock"
             android:title="Cerrar sesión" />
@@ -17,10 +21,6 @@
             android:id="@+id/principal"
             android:icon="@drawable/ic_home_black"
             android:title="Página principal" />
-        <item
-            android:id="@+id/login"
-            android:icon="@drawable/ic_power_black"
-            android:title="Iniciar sesión" />
         <item
             android:id="@+id/maps"
             android:icon="@drawable/ic_map_black"

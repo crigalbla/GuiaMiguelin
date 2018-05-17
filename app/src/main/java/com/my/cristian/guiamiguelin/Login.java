@@ -65,7 +65,15 @@ public class Login extends AppCompatActivity
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        // Si le dije que recordara mi contraseña, que me envie directamente a la página principal.
+        if(Preferences.obtenerPreferenceBoolean(this,Preferences.PREFERENCE_STATE_BUTTON_SESION)){
+            Intent i = new Intent(Login.this, MainActivity.class);
+            startActivity(i);
+        }
+        isActivateRadioButton = KeepSesion.isChecked(); // Comienza desactivado
+
         // Esto es el desplegable
+        configToobar();
         DrawerLayout drawer = findViewById(R.id.drawer_layout_login);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -74,16 +82,9 @@ public class Login extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        // Si le dije que recordara mi contraseña, que me envie directamente a la página principal.
-        if(Preferences.obtenerPreferenceBoolean(this,Preferences.PREFERENCE_STATE_BUTTON_SESION)){
-            Intent i = new Intent(Login.this, MainActivity.class);
-            startActivity(i);
-        }
-
-        isActivateRadioButton = KeepSesion.isChecked(); // Comienza desactivado
     }
 
+    // Esto es para cuando se pulse en navigation drawer (para desplegarlo)
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = findViewById(R.id.drawer_layout_login);
@@ -92,6 +93,11 @@ public class Login extends AppCompatActivity
         } else {
             super.onBackPressed();
         }
+    }
+
+    // Para nombrar el action bar
+    private void configToobar() {
+        setSupportActionBar(toolbar);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -104,12 +110,16 @@ public class Login extends AppCompatActivity
 
         if (id == R.id.profile) {
             i = new Intent(Login.this, Profile.class);
-        } else if (id == R.id.logout) {
-            // TODO
-        } else if (id == R.id.principal) {
-            i = new Intent(Login.this, MainActivity.class);
         } else if (id == R.id.login) {
             i = new Intent(Login.this, Login.class);
+        } else if (id == R.id.logout) {
+            Preferences.savePreferenceString(Login.this, "",
+                    Preferences.PREFERENCE_USER_LOGIN);
+            Preferences.savePreferenceBoolean(Login.this, false,
+                    Preferences.PREFERENCE_STATE_BUTTON_SESION);
+            i = new Intent(Login.this, MainActivity.class);
+        } else if (id == R.id.principal) {
+            i = new Intent(Login.this, MainActivity.class);
         } else if (id == R.id.maps) {
             i = new Intent(Login.this, GoogleMaps.class);
         } else if (id == R.id.search_user) {
@@ -129,7 +139,6 @@ public class Login extends AppCompatActivity
 
     @OnClick(R.id.log_in)
     public void loginOnClick() {
-//        new MongoDB().mongoAPI("/status", "POST", this); // Prueba para el servidor heroku
         NICK = username.getText().toString();
         PASSWORD = passaword.getText().toString();
 
