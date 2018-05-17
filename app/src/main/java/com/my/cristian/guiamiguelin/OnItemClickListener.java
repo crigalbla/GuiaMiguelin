@@ -1,13 +1,13 @@
 package com.my.cristian.guiamiguelin;
 
-import domain.Restaurant;
+import domain.Establishment;
 
 /**
  * Created by Cristian on 02/03/2018.
  */
 
 interface OnItemClickListener {
-    void onItemClick(Restaurant restaurante);
-    void onLongItemClick(Restaurant restaurante);
+    void onItemClick(Establishment establishment);
+    void onLongItemClick(Establishment establishment);
 }
 

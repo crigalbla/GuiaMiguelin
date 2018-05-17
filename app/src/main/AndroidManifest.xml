@@ -25,7 +25,8 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,21 +35,29 @@
         </activity>
         <activity
             android:name=".Login"
-            android:label="Iniciar sesión" />
+            android:label="Iniciar sesión"
+            android:screenOrientation="portrait"/>
         <activity android:name=".GoogleMaps" />
         <activity
             android:name=".EstablishmentSearch"
-            android:label="Búsqueda de establecimientos" />
+            android:label="Búsqueda de establecimientos"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".UserSearch"
-            android:label="Búsqueda de usuarios" />
+            android:label="Búsqueda de usuarios"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MongoDB"
-            android:label="MongoDB" />
-        <activity android:name=".Profile" />
-        <activity android:name=".EditProfile" />
-        <activity android:name=".ShowEstablishment" />
-        <activity android:name=".Register"></activity>
+            android:label="MongoDB"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Profile"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".EditProfile"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ShowEstablishment"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".Register"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

@@ -31,9 +31,8 @@
                     android:layout_marginBottom="@dimen/pading_medium"
                     android:layout_marginTop="@dimen/pading_medium"
                     android:layout_marginLeft="@dimen/pading_medium"
-                    android:ems="12"
                     android:inputType="text"
-                    android:hint="Buscar establecimiento" />
+                    android:hint="Introduce búsqueda" />
 
                 <Button
                     android:id="@+id/searchButoon"
@@ -50,13 +49,17 @@
                 android:layout_height="wrap_content"
                 android:text="Bares"
                 android:gravity="center"
+                android:background="@color/colorPrimary"
+                android:textColor="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <ScrollView
-                android:layout_width="400dp"
-                android:layout_height="250dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/pading_medium">
+                android:layout_marginBottom="@dimen/pading_medium"
+                android:background="@drawable/border">
 
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/recyclePubs"
@@ -65,28 +68,33 @@
                     tools:listitem="@layout/establishments">
 
                 </android.support.v7.widget.RecyclerView>
-            </ScrollView>
+        </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Restaurantes"
                 android:gravity="center"
+                android:background="@color/colorPrimary"
+                android:textColor="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
-            <ScrollView
-                android:layout_width="400dp"
-                android:layout_height="250dp"
-                android:layout_gravity="center">
+        <LinearLayout
+            android:id="@+id/layoutRestaurant"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_gravity="center"
+            android:orientation="vertical">
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recycleRestaurants"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:listitem="@layout/establishments">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycleRestaurants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border"
+                tools:listitem="@layout/establishments">
 
-                </android.support.v7.widget.RecyclerView>
-            </ScrollView>
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

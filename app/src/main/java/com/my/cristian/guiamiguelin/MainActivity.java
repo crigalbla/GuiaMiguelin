@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import domain.Establishment;
 import domain.Restaurant;
 import domain.TypeRestaurant;
 
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.recycle)
     RecyclerView recycle;
 
-    private RestaurantAdapter adapter;
+    private EstablishmentAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,12 +134,12 @@ public class MainActivity extends AppCompatActivity
     // Métodos auxiliares --------------------------------------------------------------------------
 
     @Override
-    public void onItemClick(Restaurant restaurante) {
+    public void onItemClick(Establishment establishment) {
 
     }
 
     @Override
-    public void onLongItemClick(Restaurant restaurante) {
+    public void onLongItemClick(Establishment establishment) {
 
     }
 
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void configAdapter() {
-        adapter = new RestaurantAdapter(new ArrayList<Restaurant>(), this);
+        adapter = new EstablishmentAdapter(new ArrayList<Establishment>(), this);
     }
 
     private void configReclyclerView() {

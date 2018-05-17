@@ -13,20 +13,20 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import domain.Restaurant;
+import domain.Establishment;
 
 /**
  * Created by Cristian on 02/03/2018.
  */
 
-public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolder> {
+public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdapter.ViewHolder> {
 
-    private List<Restaurant> restaurantes;
+    private List<Establishment> establishments;
     private Context context;
     private OnItemClickListener listener;
 
-    public RestaurantAdapter(List<Restaurant> restaurantes, OnItemClickListener listener) {
-        this.restaurantes = restaurantes;
+    public EstablishmentAdapter(List<Establishment> establishments, OnItemClickListener listener) {
+        this.establishments = establishments;
         this.listener = listener;
     }
 
@@ -40,24 +40,24 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        final Restaurant restaurante = restaurantes.get(position);
+        final Establishment establishment = establishments.get(position);
 
-        holder.setListener(restaurante, listener);
+        holder.setListener(establishment, listener);
 
-        holder.nameEstablishment.setText(restaurante.getName());
-        holder.adrresEstablishment.setText(restaurante.getAddress());
-        holder.puntuation.setText(String.valueOf(restaurante.getAverage()));
+        holder.nameEstablishment.setText(establishment.getName());
+        holder.adrresEstablishment.setText(establishment.getAddress());
+        holder.puntuation.setText(String.valueOf(establishment.getAverage()));
 
     }
 
     @Override
     public int getItemCount() {
-        return this.restaurantes.size();
+        return this.establishments.size();
     }
 
-    public void add(Restaurant restaurante) {
-        if (!restaurantes.contains(restaurante)) {
-            restaurantes.add(restaurante);
+    public void add(Establishment establishment) {
+        if (!establishments.contains(establishment)) {
+            establishments.add(establishment);
             notifyDataSetChanged();
         }
     }
@@ -80,11 +80,11 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
             ButterKnife.bind(this, itemView);
         }
 
-        void setListener(final Restaurant restaurante, final OnItemClickListener listener) {
+        void setListener(final Establishment establishment, final OnItemClickListener listener) {
             rlyEstablishment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    listener.onItemClick(restaurante);
+                    listener.onItemClick(establishment);
                 }
             });
 
@@ -92,7 +92,7 @@ public class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.Vi
             rlyEstablishment.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
-                    listener.onItemClick(restaurante);
+                    listener.onItemClick(establishment);
                     return true;
                 }
             });
