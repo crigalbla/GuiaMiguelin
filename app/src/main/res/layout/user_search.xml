@@ -8,42 +8,55 @@
     app:cardUseCompatPadding="true"
     tools:context=".UserSearch">
 
-    <!-- TODO terminar-->
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/lyPrincipal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/lyPrincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center">
 
             <EditText
                 android:id="@+id/search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/pading_medium"
-                android:ems="12"
+                android:layout_marginBottom="@dimen/pading_medium"
+                android:layout_marginTop="@dimen/pading_medium"
+                android:layout_marginLeft="@dimen/pading_medium"
                 android:inputType="text"
-                android:hint="Buscar usuario" />
+                android:hint="Introduce búsqueda" />
 
             <Button
                 android:id="@+id/searchButoon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginRight="@dimen/pading_medium"
                 android:theme="@style/buttons"
                 android:text="Buscar" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:listitem="@layout/users">
-
-            </android.support.v7.widget.RecyclerView>
         </LinearLayout>
-    </ScrollView>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Usuarios"
+            android:gravity="center"
+            android:background="@color/colorPrimary"
+            android:textColor="#ffffff"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycleUsers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/border"
+            tools:listitem="@layout/users">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>

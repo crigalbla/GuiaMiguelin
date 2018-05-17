@@ -22,7 +22,7 @@
             android:src="@drawable/ic_person_black"/>
 
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/userName"
+            android:id="@+id/userNick"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nombre usuario"
@@ -39,7 +39,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_margin="@dimen/pading_small"
             android:layout_toEndOf="@id/imgListUser"
-            android:layout_below="@id/userName"/>
+            android:layout_below="@id/userNick"/>
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/surnames"
@@ -49,6 +49,15 @@
             android:layout_toEndOf="@+id/name"
             android:hint="Apellidos"
             android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <Button
+            android:id="@+id/seguir"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/pading_small"
+            android:text="Seguir"
+            android:layout_alignParentEnd="true"
+            android:theme="@style/buttons"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>
