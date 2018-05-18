@@ -29,6 +29,7 @@
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_margin="@dimen/pading_small"
+            android:layout_toStartOf="@+id/follow"
             android:layout_toEndOf="@id/imgListUser"/>
 
         <android.support.v7.widget.AppCompatTextView
@@ -48,10 +49,11 @@
             android:layout_alignBaseline="@+id/name"
             android:layout_toEndOf="@+id/name"
             android:hint="Apellidos"
+            android:layout_toStartOf="@+id/follow"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Button
-            android:id="@+id/seguir"
+            android:id="@+id/follow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/pading_small"

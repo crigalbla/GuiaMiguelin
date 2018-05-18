@@ -10,17 +10,17 @@ public class Pub extends Establishment {
 
     private TypePub typePub;
 
-    public Pub(String name, String address, String description, double latitud, double longitud,
+    public Pub(String _id, String name, String address, String description, double latitud, double longitud,
                String closing, String opening, int phone, double average,
                List<String> reviews, String carte, TypePub typePub) {
-        super(name, address, description, latitud, longitud, closing, opening, phone,
+        super(_id, name, address, description, latitud, longitud, closing, opening, phone,
                 average, reviews, carte);
         this.typePub = typePub;
     }
 
-    public Pub(String name, String address, String description, double latitud, double longitud,
+    public Pub(String _id, String name, String address, String description, double latitud, double longitud,
                String closing, String opening, int phone, double average, TypePub typePub) {
-        super(name, address, description, latitud, longitud, closing, opening, phone,
+        super(_id, name, address, description, latitud, longitud, closing, opening, phone,
                 average);
         this.typePub = typePub;
     }

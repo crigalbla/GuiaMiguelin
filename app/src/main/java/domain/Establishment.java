@@ -8,6 +8,7 @@ import java.util.List;
 
 public class Establishment {
 
+    private String _id;
     private String name;
     private String address;
     private String description;
@@ -20,9 +21,10 @@ public class Establishment {
     private List<String> reviews;
     private String carte;
 
-    public Establishment(String name, String address, String description, double latitud,
+    public Establishment(String _id, String name, String address, String description, double latitud,
                          double longitud, String opening, String closing, int phone,
                          double average, List<String> reviews, String carte) {
+        this._id = _id;
         this.name = name;
         this.address = address;
         this.description = description;
@@ -36,9 +38,10 @@ public class Establishment {
         this.carte = carte;
     }
 
-    public Establishment(String name, String address, String description, double latitud,
+    public Establishment(String _id, String name, String address, String description, double latitud,
                          double longitud, String opening, String closing, int phone,
                          double average) {
+        this._id = _id;
         this.name = name;
         this.address = address;
         this.description = description;
@@ -52,6 +55,14 @@ public class Establishment {
 
     public Establishment(){
 
+    }
+
+    public String getId() {
+        return _id;
+    }
+
+    public void setId(String _id) {
+        this._id = _id;
     }
 
     public String getName() {

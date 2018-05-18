@@ -8,6 +8,5 @@ import domain.Establishment;
 
 interface OnItemClickListener {
     void onItemClick(Establishment establishment);
-    void onItemLongClick(Establishment establishment);
 }
 

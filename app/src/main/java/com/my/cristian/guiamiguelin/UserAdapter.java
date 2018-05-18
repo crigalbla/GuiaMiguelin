@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -24,6 +25,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private List<User> users;
     private Context context;
     private OnItemClickListener2 listener;
+    private List<String> ids = new ArrayList<String>();
 
     public UserAdapter(List<User> users, OnItemClickListener2 listener) {
         this.users = users;
@@ -48,6 +50,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         holder.name.setText(user.getName());
         holder.surnames.setText(user.getSurname());
 
+        ids.add(user.getId());
     }
 
     @Override
@@ -60,6 +63,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             users.add(user);
             notifyDataSetChanged();
         }
+    }
+
+    public String getId(Integer position){
+        return ids.get(position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

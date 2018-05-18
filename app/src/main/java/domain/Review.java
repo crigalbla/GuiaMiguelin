@@ -6,25 +6,36 @@ package domain;
 
 public class Review {
 
+    private String _id;
     private int puntuation;
     private String comment;
     private String author;
     private String establishment;
 
-    public Review(int puntuation, String comment, String author, String establishment) {
+    public Review(String _id, int puntuation, String comment, String author, String establishment) {
+        this._id =_id;
         this.puntuation = puntuation;
         this.comment = comment;
         this.author = author;
         this.establishment = establishment;
     }
 
-    public Review(int puntuation, String comment) {
+    public Review(String _id, int puntuation, String comment) {
+        this._id =_id;
         this.puntuation = puntuation;
         this.comment = comment;
     }
 
     public Review() {
 
+    }
+
+    public String getId() {
+        return _id;
+    }
+
+    public void setId(String _id) {
+        this._id = _id;
     }
 
     public int getPuntuation() {

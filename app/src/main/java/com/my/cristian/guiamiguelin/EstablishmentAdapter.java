@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -24,6 +25,7 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
     private List<Establishment> establishments;
     private Context context;
     private OnItemClickListener listener;
+    private List<String> ids = new ArrayList<String>();
 
     public EstablishmentAdapter(List<Establishment> establishments, OnItemClickListener listener) {
         this.establishments = establishments;
@@ -52,6 +54,8 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
             holder.puntuation.setText("N/A");
         }
 
+        if(establishment.getId().length() > 23) // TODO quitar if cuando esté hecho la recomendación en la página principal
+            ids.add(establishment.getId()); // Guardo el id
     }
 
     @Override
@@ -64,6 +68,10 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
             establishments.add(establishment);
             notifyDataSetChanged();
         }
+    }
+
+    public String getId(Integer position){
+        return ids.get(position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

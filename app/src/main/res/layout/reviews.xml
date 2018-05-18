@@ -10,41 +10,30 @@
         android:id="@+id/rlyEstablishment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clickable="true"
         android:focusable="true">
 
-        <android.support.v7.widget.AppCompatImageView
-            android:id="@+id/imgListEstablishment"
-            android:layout_width="@dimen/img_list_size"
-            android:layout_height="@dimen/img_list_size"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/ic_restaurant"/>
-
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/nameEstablishment"
+            android:id="@+id/authorReview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Nombre establecimiento"
+            android:hint="Autor"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:layout_margin="@dimen/pading_small"
-            android:layout_toStartOf="@+id/puntuation"
-            android:layout_toEndOf="@id/imgListEstablishment"/>
+            android:layout_toStartOf="@+id/puntuation"/>
 
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/adrresEstablishment"
+            android:id="@+id/commentReview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Calle del establecimiento"
+            android:hint="Comentario de la reseña"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:layout_margin="@dimen/pading_small"
-            android:layout_toStartOf="@+id/puntuation"
-            android:layout_toEndOf="@id/imgListEstablishment"
-            android:layout_below="@id/nameEstablishment"/>
+            android:layout_toStartOf="@+id/puntuationReview"
+            android:layout_below="@id/authorReview"/>
 
         <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/puntuation"
+            android:id="@+id/puntuationReview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"

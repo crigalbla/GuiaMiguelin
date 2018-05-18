@@ -50,12 +50,17 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
 
     @Override
     public void onItemClick(User user) {
+        String a = "";
+        String b = user.getId().toString();
+        for(int i=0; i<adapter.getItemCount(); i++){
+            a = adapter.getId(i);
 
-    }
-
-    @Override
-    public void onItemLongClick(User user) {
-
+            if(a.contains(b)){
+                Toast.makeText(UserSearch.this,"Usuario"+a,
+                        Toast.LENGTH_LONG).show();
+                break;
+            }
+        }
     }
 
     private void configAdapter() {

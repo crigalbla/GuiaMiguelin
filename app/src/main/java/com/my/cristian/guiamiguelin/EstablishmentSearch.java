@@ -61,12 +61,31 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
 
     @Override
     public void onItemClick(Establishment establishment) {
+        String a = "";
+        String b = establishment.getId().toString();
+        Boolean entrar = true;
 
-    }
+        for(int i=0; i<adapter1.getItemCount(); i++){
+            a = adapter1.getId(i);
 
-    @Override
-    public void onItemLongClick(Establishment establishment) {
+            if(a.contains(b)){
+                Toast.makeText(EstablishmentSearch.this,"Bar"+a,
+                        Toast.LENGTH_LONG).show();
+                entrar = false;
+                break;
+            }
+        }
 
+        if(entrar)
+        for(int i=0; i<adapter2.getItemCount(); i++){
+            a = adapter2.getId(i);
+
+            if(a.contains(b)){
+                Toast.makeText(EstablishmentSearch.this,"Restaurante"+a,
+                        Toast.LENGTH_LONG).show();
+                break;
+            }
+        }
     }
 
     private void configAdapter() {

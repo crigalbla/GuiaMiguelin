@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         double[] notasMedia = {5.0, 4.7, 2.3, 4.8};
 
         for (int i = 0; i < 4; i++) {
-            Restaurant restaurante = new Restaurant(nombres[i], direcciones[i],
+            Restaurant restaurante = new Restaurant("", nombres[i], direcciones[i],
                     "descripción", latitudes[i], longitudes[i], cierres[i], aperturas[i],
                     telefonos[i], notasMedia[i], new ArrayList<String>(), null, TypeRestaurant.BUFFET);
             adapter.add(restaurante);
