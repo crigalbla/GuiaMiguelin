@@ -113,12 +113,6 @@ public class MainActivity extends AppCompatActivity
                 Toast.LENGTH_LONG).show();
     }
 
-    @Override
-    public void onItemLongClick(Establishment establishment) {
-        Toast.makeText(MainActivity.this,"Acabas de dejar pulsado un establecimiento",
-                Toast.LENGTH_LONG).show();
-    }
-
     private void configAdapter() {
         adapter = new EstablishmentAdapter(new ArrayList<Establishment>(), this);
     }
@@ -142,7 +136,7 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < 4; i++) {
             Restaurant restaurante = new Restaurant("", nombres[i], direcciones[i],
                     "descripción", latitudes[i], longitudes[i], cierres[i], aperturas[i],
-                    telefonos[i], notasMedia[i], new ArrayList<String>(), null, TypeRestaurant.BUFFET);
+                    telefonos[i], notasMedia[i], new ArrayList<String>(), null, TypeRestaurant.Buffet);
             adapter.add(restaurante);
         }
     }

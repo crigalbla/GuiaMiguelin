@@ -124,7 +124,7 @@ public class Profile extends AppCompatActivity {
                 String description = (userLogged.getDescription() != null)? userLogged.getDescription() : null;
 
                 if(phone != null)
-                    TVphone.setText(phone);
+                    TVphone.setText(phone.toString());
                 if(city != null)
                     TVcity.setText(city);
                 if(email != null)

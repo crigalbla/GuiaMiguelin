@@ -137,7 +137,7 @@ public class EditProfile extends AppCompatActivity {
                 String description = (userLogged.getDescription() != null)? userLogged.getDescription() : null;
 
                 if(phone != null)
-                    etPhone.setText(phone);
+                    etPhone.setText(phone.toString());
                 if(city != null)
                     etCity.setText(city);
                 if(email != null)

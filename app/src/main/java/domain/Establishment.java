@@ -12,18 +12,18 @@ public class Establishment {
     private String name;
     private String address;
     private String description;
-    private double latitud;
-    private double longitud;
+    private Double latitud;
+    private Double longitud;
     private String opening;
     private String closing;
-    private int phone;
-    private double average;
+    private Integer phone;
+    private Double average;
     private List<String> reviews;
     private String carte;
 
-    public Establishment(String _id, String name, String address, String description, double latitud,
-                         double longitud, String opening, String closing, int phone,
-                         double average, List<String> reviews, String carte) {
+    public Establishment(String _id, String name, String address, String description, Double latitud,
+                         Double longitud, String opening, String closing, Integer phone,
+                         Double average, List<String> reviews, String carte) {
         this._id = _id;
         this.name = name;
         this.address = address;
@@ -38,9 +38,9 @@ public class Establishment {
         this.carte = carte;
     }
 
-    public Establishment(String _id, String name, String address, String description, double latitud,
-                         double longitud, String opening, String closing, int phone,
-                         double average) {
+    public Establishment(String _id, String name, String address, String description, Double latitud,
+                         Double longitud, String opening, String closing, Integer phone,
+                         Double average) {
         this._id = _id;
         this.name = name;
         this.address = address;
@@ -89,19 +89,19 @@ public class Establishment {
         this.description = description;
     }
 
-    public double getLatitud() {
+    public Double getLatitud() {
         return latitud;
     }
 
-    public void setLatitud(double latitud) {
+    public void setLatitud(Double latitud) {
         this.latitud = latitud;
     }
 
-    public double getLongitud() {
+    public Double getLongitud() {
         return longitud;
     }
 
-    public void setLongitud(double longitud) {
+    public void setLongitud(Double longitud) {
         this.longitud = longitud;
     }
 
@@ -121,19 +121,19 @@ public class Establishment {
         this.closing = closing;
     }
 
-    public int getPhone() {
+    public Integer getPhone() {
         return phone;
     }
 
-    public void setPhone(int phone) {
+    public void setPhone(Integer phone) {
         this.phone = phone;
     }
 
-    public double getAverage() {
+    public Double getAverage() {
         return average;
     }
 
-    public void setAverage(double average) {
+    public void setAverage(Double average) {
         this.average = average;
     }
 

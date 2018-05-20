@@ -7,12 +7,12 @@ package domain;
 public class Review {
 
     private String _id;
-    private int puntuation;
+    private Integer puntuation;
     private String comment;
     private String author;
     private String establishment;
 
-    public Review(String _id, int puntuation, String comment, String author, String establishment) {
+    public Review(String _id, Integer puntuation, String comment, String author, String establishment) {
         this._id =_id;
         this.puntuation = puntuation;
         this.comment = comment;
@@ -20,7 +20,7 @@ public class Review {
         this.establishment = establishment;
     }
 
-    public Review(String _id, int puntuation, String comment) {
+    public Review(String _id, Integer puntuation, String comment) {
         this._id =_id;
         this.puntuation = puntuation;
         this.comment = comment;
@@ -38,11 +38,11 @@ public class Review {
         this._id = _id;
     }
 
-    public int getPuntuation() {
+    public Integer getPuntuation() {
         return puntuation;
     }
 
-    public void setPuntuation(int puntuation) {
+    public void setPuntuation(Integer puntuation) {
         this.puntuation = puntuation;
     }
 

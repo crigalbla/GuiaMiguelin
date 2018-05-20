@@ -2,6 +2,7 @@ package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -69,8 +70,10 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
             a = adapter1.getId(i);
 
             if(a.contains(b)){
-                Toast.makeText(EstablishmentSearch.this,"Bar"+a,
-                        Toast.LENGTH_LONG).show();
+                Intent in = new Intent(EstablishmentSearch.this, ShowEstablishment.class);
+                in.putExtra("pubId", a);
+                startActivity(in);
+
                 entrar = false;
                 break;
             }
@@ -81,8 +84,10 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
             a = adapter2.getId(i);
 
             if(a.contains(b)){
-                Toast.makeText(EstablishmentSearch.this,"Restaurante"+a,
-                        Toast.LENGTH_LONG).show();
+                Intent in = new Intent(EstablishmentSearch.this, ShowEstablishment.class);
+                in.putExtra("restaurantId", a);
+                startActivity(in);
+
                 break;
             }
         }

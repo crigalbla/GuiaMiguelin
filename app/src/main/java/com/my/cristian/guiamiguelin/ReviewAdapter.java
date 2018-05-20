@@ -25,7 +25,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
     private OnItemClickListener listener;
     private List<String> ids = new ArrayList<String>();
 
-    public ReviewAdapter(List<Review> reviews, OnItemClickListener listener) {
+    public ReviewAdapter(List<Review> reviews) {
         this.reviews = reviews;
         this.listener = listener;
     }
@@ -43,7 +43,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         final Review review = reviews.get(position);
 
         holder.authorReview.setText(review.getAuthor());
-        holder.puntuationReview.setText(review.getPuntuation());
+        holder.puntuationReview.setText(review.getPuntuation().toString());
         if(review.getComment() != null) {
             holder.commentReview.setText(review.getComment());
         }else {

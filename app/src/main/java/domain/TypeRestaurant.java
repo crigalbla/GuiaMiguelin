@@ -1,5 +1,5 @@
 package domain;
 
 public enum TypeRestaurant {
-    COMIDA_RÁPIDA, BUFFET, LOW_COST, GOURMET, PARA_LLEVAR, FUSIÓN, CLÁSICO, OTRO
+    Comida_rápida, Buffet, Low_cost, Gourmet, Para_llevar, Fusión, Clásico, Otro
 }
