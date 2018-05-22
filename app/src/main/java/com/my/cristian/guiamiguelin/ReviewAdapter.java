@@ -47,7 +47,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
         if(review.getComment() != null) {
             holder.commentReview.setText(review.getComment());
         }else {
-            holder.commentReview.setText("");
+            holder.commentReview.setVisibility(View.INVISIBLE);
         }
 
         ids.add(review.getId()); // Guardo el id

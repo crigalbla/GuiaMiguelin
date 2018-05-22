@@ -12,10 +12,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,8 +48,6 @@ public class Login extends AppCompatActivity
     Button logIn;
     @BindView(R.id.textRegister)
     TextView textRegister;
-    @BindView(R.id.KeepSesion)
-    RadioButton KeepSesion;
     @BindView(R.id.drawer_layout_login)
     DrawerLayout drawerLayoutLogin;
 
@@ -57,20 +57,17 @@ public class Login extends AppCompatActivity
     private String NICK = "";
     private String PASSWORD = "";
 
-    private boolean isActivateRadioButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
-        // Si le dije que recordara mi contraseña, que me envie directamente a la página principal.
-        if(Preferences.obtenerPreferenceBoolean(this,Preferences.PREFERENCE_STATE_BUTTON_SESION)){
+        // Si he iniciado sesión, que me envie directamente a la página principal.
+        if(Preferences.obtenerPreferenceString(this,Preferences.PREFERENCE_USER_LOGIN).length() > 0){
             Intent i = new Intent(Login.this, MainActivity.class);
             startActivity(i);
         }
-        isActivateRadioButton = KeepSesion.isChecked(); // Comienza desactivado
 
         // Esto es el desplegable
         configToobar();
@@ -80,8 +77,10 @@ public class Login extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view_login);
         navigationView.setNavigationItemSelectedListener(this);
+
+        whatShow();
     }
 
     // Esto es para cuando se pulse en navigation drawer (para desplegarlo)
@@ -108,24 +107,18 @@ public class Login extends AppCompatActivity
         int id = item.getItemId();
         Intent i = null;
 
-        if (id == R.id.profile) {
-            i = new Intent(Login.this, Profile.class);
-        } else if (id == R.id.login) {
-            i = new Intent(Login.this, Login.class);
-        } else if (id == R.id.logout) {
-            Preferences.savePreferenceString(Login.this, "",
-                    Preferences.PREFERENCE_USER_LOGIN);
-            Preferences.savePreferenceBoolean(Login.this, false,
-                    Preferences.PREFERENCE_STATE_BUTTON_SESION);
-            i = new Intent(Login.this, MainActivity.class);
-        } else if (id == R.id.principal) {
-            i = new Intent(Login.this, MainActivity.class);
+        if (id == R.id.principal) {
+            finish();
+            i = new Intent(this, MainActivity.class);
         } else if (id == R.id.maps) {
-            i = new Intent(Login.this, GoogleMaps.class);
+            finish();
+            i = new Intent(this, GoogleMaps.class);
         } else if (id == R.id.search_user) {
-            i = new Intent(Login.this, UserSearch.class);
+            finish();
+            i = new Intent(this, UserSearch.class);
         } else if (id == R.id.search_estab) {
-            i = new Intent(Login.this, EstablishmentSearch.class);
+            finish();
+            i = new Intent(this, EstablishmentSearch.class);
         }
         if (i != null)
             startActivity(i);
@@ -133,6 +126,25 @@ public class Login extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout_login);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // Métodos auxiliares --------------------------------------------------------------------------
+
+    private void whatShow(){
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_login);
+        View viewHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        Menu nav_Menu = navigationView.getMenu();
+
+        ImageView imageProfile = (ImageView) viewHeader.findViewById(R.id.imageProfile);
+        TextView nickProfile = (TextView) viewHeader.findViewById(R.id.nickProfile);
+        TextView fullNameProfile = (TextView) viewHeader.findViewById(R.id.fullNameProfile);
+
+        imageProfile.setVisibility(View.INVISIBLE);
+        nickProfile.setVisibility(View.INVISIBLE);
+        fullNameProfile.setVisibility(View.INVISIBLE);
+        nav_Menu.findItem(R.id.profile).setVisible(false);
+        nav_Menu.findItem(R.id.logout).setVisible(false);
+        nav_Menu.findItem(R.id.login).setVisible(false);
     }
 
     // Botones -------------------------------------------------------------------------------------
@@ -152,11 +164,13 @@ public class Login extends AppCompatActivity
 
     public void continueLogin(){
         if(userLogged != null){
-            // Si todu ha ido bien, guardo el id de usuario y el estado del radioButton
+            // Si todu ha ido bien, guardo el id de usuario, su nick y nombre completo
             Preferences.savePreferenceString(Login.this, userLogged.getId(),
                     Preferences.PREFERENCE_USER_LOGIN);
-            Preferences.savePreferenceBoolean(Login.this, KeepSesion.isChecked(),
-                    Preferences.PREFERENCE_STATE_BUTTON_SESION);
+            Preferences.savePreferenceString(Login.this, NICK,
+                    Preferences.PREFERENCE_USER_NICK);
+            Preferences.savePreferenceString(Login.this, userLogged.getName() + ", " +
+                            userLogged.getSurname(), Preferences.PREFERENCE_USER_FULL_NAME);
 
             Intent i = new Intent(Login.this, MainActivity.class);
             startActivity(i);
@@ -171,14 +185,6 @@ public class Login extends AppCompatActivity
     public void onViewClicked() {
         Intent i = new Intent(Login.this, Register.class);
         startActivity(i);
-    }
-
-    @OnClick(R.id.KeepSesion)
-    public void onClickRadioButton() {
-        if(isActivateRadioButton){
-            KeepSesion.setChecked(false);
-        }
-        isActivateRadioButton = KeepSesion.isChecked();
     }
 
     // Peticiones a la API -------------------------------------------------------------------------

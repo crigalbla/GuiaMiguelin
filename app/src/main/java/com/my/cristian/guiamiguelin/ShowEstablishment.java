@@ -28,6 +28,7 @@ import butterknife.OnClick;
 import domain.Pub;
 import domain.Restaurant;
 import domain.Review;
+import domain.User;
 
 public class ShowEstablishment extends AppCompatActivity {
 
@@ -52,6 +53,8 @@ public class ShowEstablishment extends AppCompatActivity {
 
     private Pub pub = null;
     private Restaurant restaurant = null;
+    private User user = null;
+    private int count2 = 0;
 
     private ReviewAdapter adapter;
     private Review[] reviews = null;
@@ -118,6 +121,9 @@ public class ShowEstablishment extends AppCompatActivity {
                 break;
             case ("Reviews"):
                 new GetReviewsTask().execute(URL_BASE + url);
+                break;
+            case ("User"):
+                new GetAuthorTask().execute(URL_BASE + url);
                 break;
         }
     }
@@ -272,14 +278,98 @@ public class ShowEstablishment extends AppCompatActivity {
 
             try {
                 reviews = gson.fromJson(result, Review[].class);
-                // TODO pedir el nombre del usuario
-                configAdapter();
-                configReclyclerView();
-                generateReviews();
+
+                for(Review r: reviews)
+                    mongoAPI("/users/" + r.getAuthor(), "User");
 
             } catch (Throwable throwable) {
                 Toast.makeText(ShowEstablishment.this,
                         "Ha habido un problema con la aplicación (2)",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private String getData(String urlPath) throws IOException {
+            StringBuilder result = new StringBuilder();
+            BufferedReader bufferedReader = null;
+
+            try {
+                // Iniciar, configurar solicitud y conectar al servidor
+                URL url = new URL(urlPath);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000 /* milisegundos */);
+                urlConnection.setConnectTimeout(10000 /* milisegundos */);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Content-Type", "application/json");// Cabecera de la petición
+                urlConnection.connect();
+
+                // Leer datos de respuesta del servidor
+                InputStream inputStream = urlConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+
+            } finally {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+            }
+
+            return result.toString();
+        }
+    }
+
+    // GET name of author --------------------------------------------------------------------------
+
+    @SuppressLint("StaticFieldLeak")
+    class GetAuthorTask extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                return getData(params[0]);
+            } catch (IOException ex) {
+                return "Error de conexión (3)";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try {
+                user = gson.fromJson(result, User.class);
+
+                int count = 0;
+                for(Review r: reviews){
+                    if(r.getAuthor().equals(user.getId())){
+                        r.setAuthor(user.getNick());
+                        reviews[count] = r;
+                        break;
+                    }
+                    count++;
+                }
+                count2++;
+
+                if(count2 == reviews.length){
+                    configAdapter();
+                    configReclyclerView();
+                    generateReviews();
+                }
+
+            } catch (Throwable throwable) {
+                Toast.makeText(ShowEstablishment.this,
+                        "Ha habido un problema con la aplicación (3)",
                         Toast.LENGTH_LONG).show();
             }
         }

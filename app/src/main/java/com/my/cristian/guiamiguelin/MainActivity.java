@@ -11,7 +11,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -53,6 +57,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        whatShow();
     }
 
     // Esto es para cuando se pulse en navigation drawer (para desplegarlo)
@@ -80,22 +86,28 @@ public class MainActivity extends AppCompatActivity
         Intent i = null;
 
         if (id == R.id.profile) {
-            i = new Intent(MainActivity.this, Profile.class);
+            i = new Intent(this, Profile.class);
         } else if (id == R.id.login) {
-            i = new Intent(MainActivity.this, Login.class);
+            i = new Intent(this, Login.class);
         } else if (id == R.id.logout) {
-            Preferences.savePreferenceString(MainActivity.this, "",
+            Preferences.savePreferenceString(this, "",
                     Preferences.PREFERENCE_USER_LOGIN);
-            Preferences.savePreferenceBoolean(MainActivity.this, false,
-                    Preferences.PREFERENCE_STATE_BUTTON_SESION);
-        } else if (id == R.id.principal) {
-            i = new Intent(MainActivity.this, MainActivity.class);
+            Preferences.savePreferenceString(this, "",
+                    Preferences.PREFERENCE_USER_NICK);
+            Preferences.savePreferenceString(this, "",
+                    Preferences.PREFERENCE_USER_FULL_NAME);
+            finish();
+            i = new Intent(this, MainActivity.class);
+            Toast.makeText(this,"Sesión cerrada",
+                    Toast.LENGTH_SHORT).show();
+//        } else if (id == R.id.principal) {
+//            i = new Intent(this, MainActivity.class);
         } else if (id == R.id.maps) {
-            i = new Intent(MainActivity.this, GoogleMaps.class);
+            i = new Intent(this, GoogleMaps.class);
         } else if (id == R.id.search_user) {
-            i = new Intent(MainActivity.this, UserSearch.class);
+            i = new Intent(this, UserSearch.class);
         } else if (id == R.id.search_estab) {
-            i = new Intent(MainActivity.this, EstablishmentSearch.class);
+            i = new Intent(this, EstablishmentSearch.class);
         }
         if (i != null)
             startActivity(i);
@@ -136,8 +148,40 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < 4; i++) {
             Restaurant restaurante = new Restaurant("", nombres[i], direcciones[i],
                     "descripción", latitudes[i], longitudes[i], cierres[i], aperturas[i],
-                    telefonos[i], notasMedia[i], new ArrayList<String>(), null, TypeRestaurant.Buffet);
+                    telefonos[i], notasMedia[i], new ArrayList<String>(), null,
+                    TypeRestaurant.Buffet);
             adapter.add(restaurante);
+        }
+    }
+
+    private void whatShow(){
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View viewHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        Menu nav_Menu = navigationView.getMenu();
+
+        ImageView imageProfile = (ImageView) viewHeader.findViewById(R.id.imageProfile);
+        TextView nickProfile = (TextView) viewHeader.findViewById(R.id.nickProfile);
+        TextView fullNameProfile = (TextView) viewHeader.findViewById(R.id.fullNameProfile);
+
+        imageProfile.setVisibility(View.INVISIBLE);
+        nickProfile.setVisibility(View.INVISIBLE);
+        fullNameProfile.setVisibility(View.INVISIBLE);
+        nav_Menu.findItem(R.id.profile).setVisible(false);
+        nav_Menu.findItem(R.id.logout).setVisible(false);
+        nav_Menu.findItem(R.id.principal).setVisible(false);
+
+        if(Preferences.obtenerPreferenceString(this, Preferences.PREFERENCE_USER_LOGIN).length()
+                > 0) {
+            nav_Menu.findItem(R.id.profile).setVisible(true);
+            nav_Menu.findItem(R.id.logout).setVisible(true);
+            nav_Menu.findItem(R.id.login).setVisible(false);
+            imageProfile.setVisibility(View.VISIBLE);
+            nickProfile.setVisibility(View.VISIBLE);
+            nickProfile.setText(Preferences.obtenerPreferenceString(this,
+                    Preferences.PREFERENCE_USER_NICK));
+            fullNameProfile.setVisibility(View.VISIBLE);
+            fullNameProfile.setText(Preferences.obtenerPreferenceString(this,
+                    Preferences.PREFERENCE_USER_FULL_NAME));
         }
     }
 

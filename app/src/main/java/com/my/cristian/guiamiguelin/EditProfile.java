@@ -67,18 +67,17 @@ public class EditProfile extends AppCompatActivity {
 
     @OnClick({R.id.BTsend, R.id.BTcancelEdit})
     public void onViewClicked(View view) {
-        Intent i = null;
         switch (view.getId()) {
             case R.id.BTsend:
                 mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
                         Preferences.PREFERENCE_USER_LOGIN), "PUT");
+                Intent i = new Intent(EditProfile.this, Profile.class);
+                startActivity(i);
                 break;
             case R.id.BTcancelEdit:
+                finish();
                 break;
         }
-
-        i = new Intent(EditProfile.this, Profile.class);
-        startActivity(i);
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
