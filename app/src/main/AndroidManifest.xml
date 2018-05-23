@@ -53,28 +53,31 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MongoDB"
-            android:label="MongoDB"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Profile"
+            android:label="Perfil de usuario"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".EditProfile"
+            android:label="Editar perfil"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ShowEstablishment"
+            android:label="Establecimiento"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Register"
+            android:label="Registrar usuario"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CreateReview"
-            android:label="@string/title_activity_create_review"
+            android:label="Crear reseña"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

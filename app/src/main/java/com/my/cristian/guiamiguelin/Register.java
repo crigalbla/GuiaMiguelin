@@ -2,9 +2,9 @@ package com.my.cristian.guiamiguelin;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
-import android.widget.EditText;
 
 import java.util.ArrayList;
 
@@ -18,25 +18,25 @@ public class Register extends AppCompatActivity {
     @BindView(R.id.send)
     Button send;
     @BindView(R.id.nick)
-    EditText nick;
+    TextInputEditText nick;
     @BindView(R.id.name)
-    EditText name;
+    TextInputEditText name;
     @BindView(R.id.surnames)
-    EditText surnames;
+    TextInputEditText surnames;
     @BindView(R.id.passaword)
-    EditText passaword;
+    TextInputEditText passaword;
     @BindView(R.id.verifyPassword)
-    EditText verifyPassword;
+    TextInputEditText verifyPassword;
     @BindView(R.id.telephone)
-    EditText telephone;
+    TextInputEditText telephone;
     @BindView(R.id.city)
-    EditText city;
+    TextInputEditText city;
     @BindView(R.id.email)
-    EditText email;
+    TextInputEditText email;
     @BindView(R.id.pleasures)
-    EditText pleasures;
+    TextInputEditText pleasures;
     @BindView(R.id.description)
-    EditText description;
+    TextInputEditText description;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

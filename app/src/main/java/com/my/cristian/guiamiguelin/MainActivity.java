@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onItemClick(Establishment establishment) {
-        Toast.makeText(MainActivity.this,"Acabas de pulsar en un establecimiento",
+        Toast.makeText(this,"Acabas de pulsar en un establecimiento",
                 Toast.LENGTH_LONG).show();
     }
 
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity
 
     @OnClick(R.id.fab)
     public void goToMapsFloat() {
-        Intent i = new Intent(MainActivity.this, GoogleMaps.class);
+        Intent i = new Intent(this, GoogleMaps.class);
         startActivity(i);
     }
 }

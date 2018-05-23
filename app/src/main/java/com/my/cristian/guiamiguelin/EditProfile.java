@@ -51,7 +51,7 @@ public class EditProfile extends AppCompatActivity {
     Button BTcancelEdit;
 
     private static final Gson gson = new Gson();
-    User userLogged = null;
+    private User userLogged = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

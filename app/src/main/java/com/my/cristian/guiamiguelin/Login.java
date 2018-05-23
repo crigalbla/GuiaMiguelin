@@ -65,7 +65,7 @@ public class Login extends AppCompatActivity
 
         // Si he iniciado sesión, que me envie directamente a la página principal.
         if(Preferences.obtenerPreferenceString(this,Preferences.PREFERENCE_USER_LOGIN).length() > 0){
-            Intent i = new Intent(Login.this, MainActivity.class);
+            Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
         }
 
@@ -155,7 +155,7 @@ public class Login extends AppCompatActivity
         PASSWORD = passaword.getText().toString();
 
         if(NICK.isEmpty()|| PASSWORD.isEmpty()){
-            Toast.makeText(Login.this,"Introduzca nombre de usaurio y contraseña",
+            Toast.makeText(this,"Introduzca nombre de usaurio y contraseña",
                     Toast.LENGTH_SHORT).show();
         }else {
             mongoAPI("/users/login?nick=" + NICK + "&password=" + PASSWORD, "GET");
@@ -165,25 +165,25 @@ public class Login extends AppCompatActivity
     public void continueLogin(){
         if(userLogged != null){
             // Si todu ha ido bien, guardo el id de usuario, su nick y nombre completo
-            Preferences.savePreferenceString(Login.this, userLogged.getId(),
+            Preferences.savePreferenceString(this, userLogged.getId(),
                     Preferences.PREFERENCE_USER_LOGIN);
-            Preferences.savePreferenceString(Login.this, NICK,
+            Preferences.savePreferenceString(this, NICK,
                     Preferences.PREFERENCE_USER_NICK);
-            Preferences.savePreferenceString(Login.this, userLogged.getName() + ", " +
+            Preferences.savePreferenceString(this, userLogged.getName() + ", " +
                             userLogged.getSurname(), Preferences.PREFERENCE_USER_FULL_NAME);
 
-            Intent i = new Intent(Login.this, MainActivity.class);
+            Intent i = new Intent(this, MainActivity.class);
             startActivity(i);
             finish(); // Para cerrar la vista actual de inciar sesión.
         } else { // Si el usuario no existe
-            Toast.makeText(Login.this,"Nick de usuario o contraseña incorrecto",
+            Toast.makeText(this,"Nick de usuario o contraseña incorrecto",
                     Toast.LENGTH_SHORT).show();
         }
     }
 
     @OnClick(R.id.textRegister)
     public void onViewClicked() {
-        Intent i = new Intent(Login.this, Register.class);
+        Intent i = new Intent(this, Register.class);
         startActivity(i);
     }
 
