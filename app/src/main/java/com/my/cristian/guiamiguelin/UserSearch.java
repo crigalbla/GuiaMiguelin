@@ -2,6 +2,7 @@ package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -56,8 +57,9 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
             a = adapter.getId(i);
 
             if(a.contains(b)){
-                Toast.makeText(UserSearch.this,"Usuario"+a,
-                        Toast.LENGTH_LONG).show();
+                Intent in = new Intent(UserSearch.this, Profile.class);
+                in.putExtra("userId", a);
+                startActivity(in);
                 break;
             }
         }

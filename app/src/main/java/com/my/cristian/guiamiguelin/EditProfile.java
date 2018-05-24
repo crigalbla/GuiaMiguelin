@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -49,6 +50,10 @@ public class EditProfile extends AppCompatActivity {
     Button BTsend;
     @BindView(R.id.BTcancelEdit)
     Button BTcancelEdit;
+    @BindView(R.id.tName)
+    TextInputLayout tName;
+    @BindView(R.id.tSurnames)
+    TextInputLayout tSurnames;
 
     private static final Gson gson = new Gson();
     private User userLogged = null;
@@ -63,16 +68,31 @@ public class EditProfile extends AppCompatActivity {
                 Preferences.PREFERENCE_USER_LOGIN), "GET");
     }
 
+    // Métodos auxiliares --------------------------------------------------------------------------
+
+    private boolean validations(TextInputEditText text, TextInputLayout layout, String error) {
+        if (text.getText().toString().trim().isEmpty()) {
+            layout.setError(error);
+            return false;
+        } else {
+            layout.setErrorEnabled(false);
+        }
+        return true;
+    }
+
     // Botones -------------------------------------------------------------------------------------
 
     @OnClick({R.id.BTsend, R.id.BTcancelEdit})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.BTsend:
-                mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
-                        Preferences.PREFERENCE_USER_LOGIN), "PUT");
-                Intent i = new Intent(EditProfile.this, Profile.class);
-                startActivity(i);
+                if(validations(etName, tName, "Rellenar nombre") &&
+                        validations(etSurnames, tSurnames, "Rellenar apellidos")){
+                    mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
+                            Preferences.PREFERENCE_USER_LOGIN), "PUT");
+                    Intent i = new Intent(this, Profile.class);
+                    startActivity(i);
+                }
                 break;
             case R.id.BTcancelEdit:
                 finish();
@@ -129,21 +149,21 @@ public class EditProfile extends AppCompatActivity {
             if (userLogged != null) {
                 etName.setText(userLogged.getName());
                 etSurnames.setText(userLogged.getSurname());
-                Integer phone = (userLogged.getPhone() != null)? new Integer(userLogged.getPhone()) : null;
-                String city = (userLogged.getCity() != null)? userLogged.getCity() : null;
-                String email = (userLogged.getEmail() != null)? userLogged.getEmail() : null;
-                String pleasures = (userLogged.getPleasures() != null)? userLogged.getPleasures() : null;
-                String description = (userLogged.getDescription() != null)? userLogged.getDescription() : null;
+                Integer phone = (userLogged.getPhone() != null) ? new Integer(userLogged.getPhone()) : null;
+                String city = (userLogged.getCity() != null) ? userLogged.getCity() : null;
+                String email = (userLogged.getEmail() != null) ? userLogged.getEmail() : null;
+                String pleasures = (userLogged.getPleasures() != null) ? userLogged.getPleasures() : null;
+                String description = (userLogged.getDescription() != null) ? userLogged.getDescription() : null;
 
-                if(phone != null)
+                if (phone != null)
                     etPhone.setText(phone.toString());
-                if(city != null)
+                if (city != null)
                     etCity.setText(city);
-                if(email != null)
+                if (email != null)
                     etEmail.setText(email);
-                if(pleasures != null)
+                if (pleasures != null)
                     etPleasures.setText(pleasures);
-                if(description != null)
+                if (description != null)
                     etDescription.setText(description);
             }
 
@@ -231,7 +251,7 @@ public class EditProfile extends AppCompatActivity {
                 userLogged.setSurname(etSurnames.getText().toString());
                 userLogged.setCity(etCity.getText().toString());
                 userLogged.setEmail(etEmail.getText().toString());
-                if(!etPhone.getText().toString().isEmpty())
+                if (!etPhone.getText().toString().isEmpty())
                     userLogged.setPhone(new Integer(etPhone.getText().toString()));
                 userLogged.setPleasures(etPleasures.getText().toString());
                 userLogged.setDescription(etDescription.getText().toString());

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,10 +55,14 @@ public class Profile extends AppCompatActivity {
         setContentView(R.layout.profile);
         ButterKnife.bind(this);
 
-        //TODO hacer que se puedan mostrar otros perfiles con esta vista
-
-        mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
-                Preferences.PREFERENCE_USER_LOGIN), "GET");
+        if(getIntent().getStringExtra("userId") != null){
+            mongoAPI("/users/" + getIntent().getStringExtra("userId").toString(),
+                    "GET");
+            BTedit.setVisibility(View.INVISIBLE);
+        }else{
+            mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
+                    Preferences.PREFERENCE_USER_LOGIN), "GET");
+        }
     }
 
     // Botones -------------------------------------------------------------------------------------

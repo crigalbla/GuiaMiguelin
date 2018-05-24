@@ -49,6 +49,8 @@ public class ShowEstablishment extends AppCompatActivity {
     TextView establishmentPhone;
     @BindView(R.id.establishmentReviews)
     RecyclerView establishmentReviews;
+    @BindView(R.id.noReviews)
+    TextView noReviews;
 
     private static final Gson gson = new Gson();
 
@@ -104,39 +106,49 @@ public class ShowEstablishment extends AppCompatActivity {
         Intent i = null;
         switch (view.getId()) {
             case R.id.weStateHere:
-                // TODO pocisionar en el mapa
+                // TODO
+                Toast.makeText(ShowEstablishment.this,
+                        "Por hacer",
+                        Toast.LENGTH_SHORT).show();
                 break;
             case R.id.newReview:
-                i = new Intent(this, CreateReview.class);
+                if(Preferences.obtenerPreferenceString(this, Preferences.PREFERENCE_USER_LOGIN).length() > 0){
+                    i = new Intent(this, CreateReview.class);
 
-                String name = null;
-                String id = null;
-                String reviews = null;
-                String type = null;
-                Double average = null;
-                if(pub != null) {
-                    name = pub.getName();
-                    id = pub.getId();
-                    reviews = pub.getReviews().toString();
-                    type = "/pubs/";
-                    average = pub.getAverage();
+                    String name = null;
+                    String id = null;
+                    String reviews = null;
+                    String type = null;
+                    Double average = null;
+                    if (pub != null) {
+                        name = pub.getName();
+                        id = pub.getId();
+                        reviews = pub.getReviews().toString();
+                        type = "/pubs/";
+                        average = pub.getAverage();
+                    }
+                    if (restaurant != null) {
+                        name = restaurant.getName();
+                        id = restaurant.getId();
+                        reviews = restaurant.getReviews().toString();
+                        type = "/restaurants/";
+                        average = restaurant.getAverage();
+                    }
+                    i.putExtra("nombre_establecimiento", name);
+                    i.putExtra("id_establecimiento", id);
+                    i.putExtra("reseñas", reviews);
+                    i.putExtra("nota_media", average.toString());
+                    i.putExtra("tipo", type);
+                }else {
+                    Toast.makeText(ShowEstablishment.this,
+                            "Debes de iniciar sesión para poder dejar una reseña",
+                            Toast.LENGTH_LONG).show();
                 }
-                if(restaurant != null) {
-                    name = restaurant.getName();
-                    id = restaurant.getId();
-                    reviews = restaurant.getReviews().toString();
-                    type = "/restaurants/";
-                    average = restaurant.getAverage();
-                }
-                i.putExtra("nombre_establecimiento", name);
-                i.putExtra("id_establecimiento", id);
-                i.putExtra("reseñas", reviews);
-                i.putExtra("nota_media", average.toString());
-                i.putExtra("tipo", type);
                 break;
         }
 
-        startActivity(i);
+        if(i != null)
+            startActivity(i);
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -207,8 +219,10 @@ public class ShowEstablishment extends AppCompatActivity {
                 if (phone != null)
                     establishmentPhone.setText(phone.toString());
 
-                if(pub.getReviews().size() > 0)
+                if (pub.getReviews().size() > 0) {
+                    noReviews.setVisibility(View.INVISIBLE);
                     mongoAPI("/reviews/byEstablishment/" + pub.getId(), "Reviews");
+                }
 
             } catch (Throwable throwable) { // Si la respuesta no es un objeto Pub
                 try { // Intenta parsear a objeto Restaurant
@@ -234,9 +248,11 @@ public class ShowEstablishment extends AppCompatActivity {
                     if (phone != null)
                         establishmentPhone.setText(phone.toString());
 
-                    if(pub.getReviews().size() > 0)
+                    if (pub.getReviews().size() > 0) {
+                        noReviews.setVisibility(View.INVISIBLE);
                         mongoAPI("/reviews/byEstablishment/" + restaurant.getId(),
                                 "Reviews");
+                    }
 
                 } catch (Throwable throwable1) { // En caso de que haya habido error, notifícamelo
                     Toast.makeText(ShowEstablishment.this,
@@ -312,7 +328,7 @@ public class ShowEstablishment extends AppCompatActivity {
             try {
                 reviews = gson.fromJson(result, Review[].class);
 
-                for(Review r: reviews)
+                for (Review r : reviews)
                     mongoAPI("/users/" + r.getAuthor(), "User");
 
             } catch (Throwable throwable) {
@@ -384,8 +400,8 @@ public class ShowEstablishment extends AppCompatActivity {
                 user = gson.fromJson(result, User.class);
 
                 int count = 0;
-                for(Review r: reviews){
-                    if(r.getAuthor().equals(user.getId())){
+                for (Review r : reviews) {
+                    if (r.getAuthor().equals(user.getId())) {
                         r.setAuthor(user.getNick());
                         reviews[count] = r;
                         break;
@@ -394,7 +410,7 @@ public class ShowEstablishment extends AppCompatActivity {
                 }
                 count2++;
 
-                if(count2 == reviews.length){
+                if (count2 == reviews.length) {
                     configAdapter();
                     configReclyclerView();
                     generateReviews();
