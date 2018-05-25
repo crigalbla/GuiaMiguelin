@@ -13,12 +13,18 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,7 +53,10 @@ public class Profile extends AppCompatActivity {
     Button BTedit;
 
     private static final Gson gson = new Gson();
+    private User userProfile = null;
     private User userLogged = null;
+    private String userIdLogged = null;
+    private boolean follow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,13 +64,13 @@ public class Profile extends AppCompatActivity {
         setContentView(R.layout.profile);
         ButterKnife.bind(this);
 
+        userIdLogged = Preferences.obtenerPreferenceString(this,
+                Preferences.PREFERENCE_USER_LOGIN);
+
         if(getIntent().getStringExtra("userId") != null){
-            mongoAPI("/users/" + getIntent().getStringExtra("userId").toString(),
-                    "GET");
-            BTedit.setVisibility(View.INVISIBLE);
+            mongoAPI("/users/" + getIntent().getStringExtra("userId"),"GET");
         }else{
-            mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
-                    Preferences.PREFERENCE_USER_LOGIN), "GET");
+            mongoAPI("/users/" + userIdLogged, "GET");
         }
     }
 
@@ -69,8 +78,21 @@ public class Profile extends AppCompatActivity {
 
     @OnClick(R.id.BTedit)
     public void goToEdit() {
-        Intent i = new Intent(Profile.this, EditProfile.class);
-        startActivity(i);
+        if(getIntent().getStringExtra("userId") != null){
+            if(BTedit.getText().toString().equals("Seguir")){
+                follow = true;
+                mongoAPI("/users/" + userIdLogged, "FOLLOW-UNFOLLOW");
+            }else if(BTedit.getText().toString().equals("Dejar de seguir")){
+                follow = false;
+                mongoAPI("/users/" + userIdLogged, "FOLLOW-UNFOLLOW");
+            }else if(getIntent().getStringExtra("userId").equals(userIdLogged)){
+                Intent i = new Intent(Profile.this, EditProfile.class);
+                startActivity(i);
+            }
+        }else{
+            Intent i = new Intent(Profile.this, EditProfile.class);
+            startActivity(i);
+        }
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -81,6 +103,12 @@ public class Profile extends AppCompatActivity {
         switch (type) {
             case ("GET"):
                 new GetDataTask().execute(URL_BASE + url);
+                break;
+            case ("GET2"):
+                new Get2DataTask().execute(URL_BASE + url);
+                break;
+            case ("FOLLOW-UNFOLLOW"):
+                new PutDataTask().execute(URL_BASE + url);
                 break;
         }
     }
@@ -116,17 +144,17 @@ public class Profile extends AppCompatActivity {
             super.onPostExecute(result);
 
             try {
-                userLogged = gson.fromJson(result, User.class);
+                userProfile = gson.fromJson(result, User.class);
 
-                TVnick.setText(userLogged.getNick());
-                TVname.setText(userLogged.getName());
-                TVsurnames.setText(userLogged.getSurname());
+                TVnick.setText(userProfile.getNick());
+                TVname.setText(userProfile.getName());
+                TVsurnames.setText(userProfile.getSurname());
 
-                Integer phone = (userLogged.getPhone() != null)? new Integer(userLogged.getPhone()) : null;
-                String city = (userLogged.getCity() != null)? userLogged.getCity() : null;
-                String email = (userLogged.getEmail() != null)? userLogged.getEmail() : null;
-                String pleasures = (userLogged.getPleasures() != null)? userLogged.getPleasures() : null;
-                String description = (userLogged.getDescription() != null)? userLogged.getDescription() : null;
+                Integer phone = (userProfile.getPhone() != null)? Integer.valueOf(userProfile.getPhone()) : null;
+                String city = userProfile.getCity();
+                String email = userProfile.getEmail();
+                String pleasures = userProfile.getPleasures();
+                String description = userProfile.getDescription();
 
                 if(phone != null)
                     TVphone.setText(phone.toString());
@@ -138,6 +166,15 @@ public class Profile extends AppCompatActivity {
                     TVpleasures.setText(pleasures);
                 if(description != null)
                     TVdescription.setText(description);
+
+                if(!userIdLogged.equals(userProfile.getId()))
+                    if(userIdLogged != null && userIdLogged.length() > 0){
+                        // Cojo el usuario que ha iniciado sesión
+                        mongoAPI("/users/" + userIdLogged,"GET2");
+                    }else {
+                        BTedit.setVisibility(View.INVISIBLE);
+                    }
+
             } catch (Throwable throwable) {
                 Toast.makeText(Profile.this, "Ha habido un problema con la aplicación",
                         Toast.LENGTH_LONG).show();
@@ -178,6 +215,182 @@ public class Profile extends AppCompatActivity {
             }
 
             return result.toString();
+        }
+    }
+
+    // GET2 -----------------------------------------------------------------------------------------
+
+    @SuppressLint("StaticFieldLeak")
+    class Get2DataTask extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(Profile.this);
+            progressDialog.setMessage("Obteniendo perfil...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                return getData(params[0]);
+            } catch (IOException ex) {
+                return "Error de conexión";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try {
+                userLogged = gson.fromJson(result, User.class);
+
+                if(userLogged.getFolloweds().contains(getIntent().getStringExtra("userId"))){
+                    BTedit.setText("Dejar de seguir");
+                }else{
+                    BTedit.setText("Seguir");
+                }
+
+            } catch (Throwable throwable) {
+                Toast.makeText(Profile.this, "Ha habido un problema con la aplicación",
+                        Toast.LENGTH_LONG).show();
+            }
+
+            // Cerrar ventana de diálogo
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
+        }
+
+        private String getData(String urlPath) throws IOException {
+            StringBuilder result = new StringBuilder();
+            BufferedReader bufferedReader = null;
+
+            try {
+                // Iniciar, configurar solicitud y conectar al servidor
+                URL url = new URL(urlPath);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000 /* milisegundos */);
+                urlConnection.setConnectTimeout(10000 /* milisegundos */);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Content-Type", "application/json");// Cabecera de la petición
+                urlConnection.connect();
+
+                // Leer datos de respuesta del servidor
+                InputStream inputStream = urlConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+
+            } finally {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+            }
+
+            return result.toString();
+        }
+    }
+
+    // PUT -----------------------------------------------------------------------------------------
+
+    @SuppressLint("StaticFieldLeak")
+    class PutDataTask extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(Profile.this);
+            progressDialog.setMessage("Enviando petición...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                return putData(params[0]);
+            } catch (IOException ex) {
+                return "Error de conexión";
+            } catch (JSONException ex) {
+                return "Datos incorrectos";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            if(follow){
+                BTedit.setText("Dejar de seguir");
+                Toast.makeText(Profile.this, "Has comenzado a seguir a " + userProfile.getNick(),
+                        Toast.LENGTH_LONG).show();
+            }else{
+                BTedit.setText("Seguir");
+                Toast.makeText(Profile.this, "Has dejado de seguir a " + userProfile.getNick(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
+        }
+
+        private String putData(String urlPath) throws IOException, JSONException {
+
+            BufferedWriter bufferedWriter = null;
+
+            try {
+                // Creo los datos a actualizar
+                List<String> followeds = userLogged.getFolloweds();
+                if(follow){
+                    followeds.add(userProfile.getId());
+                }else{
+                    followeds.remove(userProfile.getId());
+                }
+                userLogged.setFolloweds(followeds);
+
+                User userLoggedPruned = new User();
+                userLoggedPruned.setFolloweds(userLogged.getFolloweds());
+                String dataToSend = gson.toJson(userLoggedPruned); // Le paso un objeto menos pesado
+
+                // Iniciar, configurar solicitud y conectar al servidor
+                URL url = new URL(urlPath);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000 /* milliseconds */);
+                urlConnection.setConnectTimeout(10000 /* milliseconds */);
+                urlConnection.setRequestMethod("PUT");
+                urlConnection.setDoOutput(true);  //enable output (body data)
+                urlConnection.setRequestProperty("Content-Type", "application/json");// set header
+                urlConnection.connect();
+
+                // Escribo los datos en el servidor
+                OutputStream outputStream = urlConnection.getOutputStream();
+                bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream));
+                bufferedWriter.write(dataToSend);
+                bufferedWriter.flush();
+
+                // Comprobar si la actuzalización ha sido correcta
+                if (urlConnection.getResponseCode() == 200) {
+                    return "Actualización correcta";
+                } else {
+                    return "Actualización fallida";
+                }
+            } finally {
+                if (bufferedWriter != null) {
+                    bufferedWriter.close();
+                }
+            }
         }
     }
 }
