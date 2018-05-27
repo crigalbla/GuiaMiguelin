@@ -34,45 +34,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Login"
-            android:label="Iniciar sesión"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".GoogleMaps"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".EstablishmentSearch"
-            android:label="Búsqueda de establecimientos"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".UserSearch"
-            android:label="Búsqueda de usuarios"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MongoDB"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Profile"
-            android:label="Perfil de usuario"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".EditProfile"
-            android:label="Editar perfil"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".ShowEstablishment"
             android:label="Establecimiento"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Register"
-            android:label="Registrar usuario"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

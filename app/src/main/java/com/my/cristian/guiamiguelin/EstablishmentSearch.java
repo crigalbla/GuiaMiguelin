@@ -1,13 +1,16 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -26,11 +29,12 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.Establishment;
 import domain.Pub;
 import domain.Restaurant;
 
-public class EstablishmentSearch extends AppCompatActivity implements OnItemClickListener {
+public class EstablishmentSearch extends Fragment implements OnItemClickListener {
 
     @BindView(R.id.search)
     EditText search;
@@ -42,6 +46,8 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
     RecyclerView recycleRestaurants;
     @BindView(R.id.layoutRestaurant)
     LinearLayout layoutRestaurant;
+    Unbinder unbinder;
+
 
     private static final Gson gson = new Gson();
 
@@ -52,10 +58,19 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
     private EstablishmentAdapter adapter2;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.establishment_search);
-        ButterKnife.bind(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.establishment_search, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos auxiliares --------------------------------------------------------------------------
@@ -70,7 +85,7 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
             a = adapter1.getId(i);
 
             if(a.contains(b)){
-                Intent in = new Intent(EstablishmentSearch.this, ShowEstablishment.class);
+                Intent in = new Intent(getActivity(), ShowEstablishment.class);
                 in.putExtra("pubId", a);
                 startActivity(in);
 
@@ -84,7 +99,7 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
             a = adapter2.getId(i);
 
             if(a.contains(b)){
-                Intent in = new Intent(EstablishmentSearch.this, ShowEstablishment.class);
+                Intent in = new Intent(getActivity(), ShowEstablishment.class);
                 in.putExtra("restaurantId", a);
                 startActivity(in);
 
@@ -99,10 +114,10 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
     }
 
     private void configReclyclerView() {
-        recyclePubs.setLayoutManager(new LinearLayoutManager(this));
+        recyclePubs.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclePubs.setAdapter(adapter1);
 
-        recycleRestaurants.setLayoutManager(new LinearLayoutManager(this));
+        recycleRestaurants.setLayoutManager(new LinearLayoutManager(getActivity()));
         recycleRestaurants.setAdapter(adapter2);
     }
 
@@ -127,7 +142,7 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
             mongoAPI("/pubs/search?search=" + searchString, "pub");
             mongoAPI("/restaurants/search?search=" + searchString, "restaurant");
         } else {
-            Toast.makeText(EstablishmentSearch.this, "Introduzca una búsqueda válida",
+            Toast.makeText(getActivity(), "Introduzca una búsqueda válida",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -158,7 +173,7 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(EstablishmentSearch.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Buscado establecimientos...");
             progressDialog.show();
         }
@@ -228,7 +243,7 @@ public class EstablishmentSearch extends AppCompatActivity implements OnItemClic
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(EstablishmentSearch.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Buscado establecimientos...");
             progressDialog.show();
         }

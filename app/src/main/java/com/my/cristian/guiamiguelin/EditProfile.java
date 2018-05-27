@@ -1,14 +1,15 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.google.gson.Gson;
@@ -28,9 +29,10 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.User;
 
-public class EditProfile extends AppCompatActivity {
+public class EditProfile extends Fragment {
 
     @BindView(R.id.etName)
     TextInputEditText etName;
@@ -54,18 +56,33 @@ public class EditProfile extends AppCompatActivity {
     TextInputLayout tName;
     @BindView(R.id.tSurnames)
     TextInputLayout tSurnames;
+    Unbinder unbinder;
 
     private static final Gson gson = new Gson();
     private User userLogged = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_profile);
-        ButterKnife.bind(this);
 
-        mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
+        mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                 Preferences.PREFERENCE_USER_LOGIN), "GET");
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.edit_profile, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos auxiliares --------------------------------------------------------------------------
@@ -88,14 +105,17 @@ public class EditProfile extends AppCompatActivity {
             case R.id.BTsend:
                 if(validations(etName, tName, "Rellenar nombre") &&
                         validations(etSurnames, tSurnames, "Rellenar apellidos")){
-                    mongoAPI("/users/" + Preferences.obtenerPreferenceString(this,
+                    mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                             Preferences.PREFERENCE_USER_LOGIN), "PUT");
-                    Intent i = new Intent(this, Profile.class);
-                    startActivity(i);
+                    getActivity().setTitle("Perfil de usuario");
+                    getActivity().getFragmentManager().beginTransaction()
+                            .replace(R.id.contenedor, new Profile()).commit();
                 }
                 break;
             case R.id.BTcancelEdit:
-                finish();
+                getActivity().setTitle("Perfil de usario");
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, new Profile()).commit();
                 break;
         }
     }
@@ -126,7 +146,7 @@ public class EditProfile extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(EditProfile.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Cargando perfil...");
             progressDialog.show();
         }
@@ -150,10 +170,10 @@ public class EditProfile extends AppCompatActivity {
                 etName.setText(userLogged.getName());
                 etSurnames.setText(userLogged.getSurname());
                 Integer phone = (userLogged.getPhone() != null) ? new Integer(userLogged.getPhone()) : null;
-                String city = (userLogged.getCity() != null) ? userLogged.getCity() : null;
-                String email = (userLogged.getEmail() != null) ? userLogged.getEmail() : null;
-                String pleasures = (userLogged.getPleasures() != null) ? userLogged.getPleasures() : null;
-                String description = (userLogged.getDescription() != null) ? userLogged.getDescription() : null;
+                String city = userLogged.getCity();
+                String email = userLogged.getEmail();
+                String pleasures = userLogged.getPleasures();
+                String description = userLogged.getDescription();
 
                 if (phone != null)
                     etPhone.setText(phone.toString());
@@ -216,7 +236,7 @@ public class EditProfile extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(EditProfile.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Enviando datos...");
             progressDialog.show();
         }

@@ -3,20 +3,15 @@ package com.my.cristian.guiamiguelin;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -50,23 +45,12 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
     private UserAdapter adapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.content_main, container, false);
+        View view = inflater.inflate(R.layout.user_search, container, false);
 
         unbinder = ButterKnife.bind(this, view);
-        RecyclerView a = recycleUsers;
-        configAdapter();
-        configReclyclerView();
-        generateUser();
-
-        whatShow();
         return view;
     }
 
@@ -86,9 +70,13 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
             a = adapter.getId(i);
 
             if(a.contains(b)){
-                Intent in = new Intent(getActivity(), Profile.class);
-                in.putExtra("userId", a);
-                startActivity(in);
+                getActivity().setTitle("Perfil de usuario");
+                Fragment fragment = new Profile();
+                Bundle args = new Bundle();
+                args.putString("userId", a);
+                fragment.setArguments(args);
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, fragment).commit();
                 break;
             }
         }
@@ -107,37 +95,6 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
 
         for (User u : users) {
             adapter.add(u);
-        }
-    }
-
-    private void whatShow() {
-        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
-        View viewHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
-        Menu nav_Menu = navigationView.getMenu();
-
-        ImageView imageProfile = (ImageView) viewHeader.findViewById(R.id.imageProfile);
-        TextView nickProfile = (TextView) viewHeader.findViewById(R.id.nickProfile);
-        TextView fullNameProfile = (TextView) viewHeader.findViewById(R.id.fullNameProfile);
-
-        imageProfile.setVisibility(View.INVISIBLE);
-        nickProfile.setVisibility(View.INVISIBLE);
-        fullNameProfile.setVisibility(View.INVISIBLE);
-        nav_Menu.findItem(R.id.profile).setVisible(false);
-        nav_Menu.findItem(R.id.logout).setVisible(false);
-        nav_Menu.findItem(R.id.principal).setVisible(false);
-
-        if (Preferences.obtenerPreferenceString(getActivity(),
-                Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
-            nav_Menu.findItem(R.id.profile).setVisible(true);
-            nav_Menu.findItem(R.id.logout).setVisible(true);
-            nav_Menu.findItem(R.id.login).setVisible(false);
-            imageProfile.setVisibility(View.VISIBLE);
-            nickProfile.setVisibility(View.VISIBLE);
-            nickProfile.setText(Preferences.obtenerPreferenceString(getActivity(),
-                    Preferences.PREFERENCE_USER_NICK));
-            fullNameProfile.setVisibility(View.VISIBLE);
-            fullNameProfile.setText(Preferences.obtenerPreferenceString(getActivity(),
-                    Preferences.PREFERENCE_USER_FULL_NAME));
         }
     }
 

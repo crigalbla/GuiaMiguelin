@@ -2,11 +2,15 @@ package com.my.cristian.guiamiguelin;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -28,14 +32,10 @@ public class ContentMain extends Fragment implements OnItemClickListener {
     private EstablishmentAdapter adapter;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        whatShow(); // Configuro el drawer para lo que debe mostrar y lo que no por defecto
         View view = inflater.inflate(R.layout.content_main, container, false);
 
         unbinder = ButterKnife.bind(this, view);
@@ -87,6 +87,37 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                     telefonos[i], notasMedia[i], new ArrayList<String>(), null,
                     TypeRestaurant.Buffet);
             adapter.add(restaurante);
+        }
+    }
+
+    private void whatShow() {
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        View viewHeader = navigationView.getHeaderView(0);
+        Menu nav_Menu = navigationView.getMenu();
+
+        ImageView imageProfile = (ImageView) viewHeader.findViewById(R.id.imageProfile);
+        TextView nickProfile = (TextView) viewHeader.findViewById(R.id.nickProfile);
+        TextView fullNameProfile = (TextView) viewHeader.findViewById(R.id.fullNameProfile);
+
+        imageProfile.setVisibility(View.INVISIBLE);
+        nickProfile.setVisibility(View.INVISIBLE);
+        fullNameProfile.setVisibility(View.INVISIBLE);
+        nav_Menu.findItem(R.id.profile).setVisible(false);
+        nav_Menu.findItem(R.id.logout).setVisible(false);
+        nav_Menu.findItem(R.id.login).setVisible(true);
+
+        if (Preferences.obtenerPreferenceString(getActivity(),
+                Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
+            nav_Menu.findItem(R.id.profile).setVisible(true);
+            nav_Menu.findItem(R.id.logout).setVisible(true);
+            nav_Menu.findItem(R.id.login).setVisible(false);
+            imageProfile.setVisibility(View.VISIBLE);
+            nickProfile.setVisibility(View.VISIBLE);
+            nickProfile.setText(Preferences.obtenerPreferenceString(getActivity(),
+                    Preferences.PREFERENCE_USER_NICK));
+            fullNameProfile.setVisibility(View.VISIBLE);
+            fullNameProfile.setText(Preferences.obtenerPreferenceString(getActivity(),
+                    Preferences.PREFERENCE_USER_FULL_NAME));
         }
     }
 

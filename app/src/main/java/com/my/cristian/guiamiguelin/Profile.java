@@ -1,12 +1,13 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,9 +30,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.User;
 
-public class Profile extends AppCompatActivity {
+public class Profile extends Fragment {
 
     @BindView(R.id.TVnick)
     TextView TVnick;
@@ -51,6 +53,7 @@ public class Profile extends AppCompatActivity {
     TextView TVdescription;
     @BindView(R.id.BTedit)
     Button BTedit;
+    Unbinder unbinder;
 
     private static final Gson gson = new Gson();
     private User userProfile = null;
@@ -59,39 +62,57 @@ public class Profile extends AppCompatActivity {
     private boolean follow = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.profile);
-        ButterKnife.bind(this);
 
-        userIdLogged = Preferences.obtenerPreferenceString(this,
+        userIdLogged = Preferences.obtenerPreferenceString(getActivity(),
                 Preferences.PREFERENCE_USER_LOGIN);
 
-        if(getIntent().getStringExtra("userId") != null){
-            mongoAPI("/users/" + getIntent().getStringExtra("userId"),"GET");
+        Object userId = getArguments() != null ? getArguments().get("userId") : null;
+        if(userId != null){
+            mongoAPI("/users/" + userId,"GET");
         }else{
             mongoAPI("/users/" + userIdLogged, "GET");
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.profile, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Botones -------------------------------------------------------------------------------------
 
     @OnClick(R.id.BTedit)
     public void goToEdit() {
-        if(getIntent().getStringExtra("userId") != null){
+        Object userId = getArguments() != null ? getArguments().get("userId") : null;
+        if(userId != null){
             if(BTedit.getText().toString().equals("Seguir")){
                 follow = true;
                 mongoAPI("/users/" + userIdLogged, "FOLLOW-UNFOLLOW");
             }else if(BTedit.getText().toString().equals("Dejar de seguir")){
                 follow = false;
                 mongoAPI("/users/" + userIdLogged, "FOLLOW-UNFOLLOW");
-            }else if(getIntent().getStringExtra("userId").equals(userIdLogged)){
-                Intent i = new Intent(Profile.this, EditProfile.class);
-                startActivity(i);
+            }else if(userId.equals(userIdLogged)){
+                getActivity().setTitle("Editar perfil");
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, new EditProfile()).commit();
             }
         }else{
-            Intent i = new Intent(Profile.this, EditProfile.class);
-            startActivity(i);
+            getActivity().setTitle("Editar perfil");
+            getActivity().getFragmentManager().beginTransaction()
+                    .replace(R.id.contenedor, new EditProfile()).commit();
         }
     }
 
@@ -124,7 +145,7 @@ public class Profile extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(Profile.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Obteniendo perfil...");
             progressDialog.show();
         }
@@ -176,7 +197,7 @@ public class Profile extends AppCompatActivity {
                     }
 
             } catch (Throwable throwable) {
-                Toast.makeText(Profile.this, "Ha habido un problema con la aplicación",
+                Toast.makeText(getActivity(), "Ha habido un problema con la aplicación",
                         Toast.LENGTH_LONG).show();
             }
 
@@ -229,7 +250,7 @@ public class Profile extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(Profile.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Obteniendo perfil...");
             progressDialog.show();
         }
@@ -251,14 +272,15 @@ public class Profile extends AppCompatActivity {
             try {
                 userLogged = gson.fromJson(result, User.class);
 
-                if(userLogged.getFolloweds().contains(getIntent().getStringExtra("userId"))){
+                Object userId = getArguments() != null ? getArguments().get("userId") : null;
+                if(userLogged.getFolloweds().contains(userId)){
                     BTedit.setText("Dejar de seguir");
                 }else{
                     BTedit.setText("Seguir");
                 }
 
             } catch (Throwable throwable) {
-                Toast.makeText(Profile.this, "Ha habido un problema con la aplicación",
+                Toast.makeText(getActivity(), "Ha habido un problema con la aplicación",
                         Toast.LENGTH_LONG).show();
             }
 
@@ -311,7 +333,7 @@ public class Profile extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(Profile.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Enviando petición...");
             progressDialog.show();
         }
@@ -333,11 +355,11 @@ public class Profile extends AppCompatActivity {
 
             if(follow){
                 BTedit.setText("Dejar de seguir");
-                Toast.makeText(Profile.this, "Has comenzado a seguir a " + userProfile.getNick(),
+                Toast.makeText(getActivity(), "Has comenzado a seguir a " + userProfile.getNick(),
                         Toast.LENGTH_LONG).show();
             }else{
                 BTedit.setText("Seguir");
-                Toast.makeText(Profile.this, "Has dejado de seguir a " + userProfile.getNick(),
+                Toast.makeText(getActivity(), "Has dejado de seguir a " + userProfile.getNick(),
                         Toast.LENGTH_LONG).show();
             }
 

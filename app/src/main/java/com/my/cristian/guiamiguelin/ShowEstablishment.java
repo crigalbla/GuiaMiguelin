@@ -1,15 +1,17 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +28,13 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.Pub;
 import domain.Restaurant;
 import domain.Review;
 import domain.User;
 
-public class ShowEstablishment extends AppCompatActivity {
+public class ShowEstablishment extends Fragment {
 
     @BindView(R.id.establishmentName)
     TextView establishmentName;
@@ -51,6 +54,7 @@ public class ShowEstablishment extends AppCompatActivity {
     RecyclerView establishmentReviews;
     @BindView(R.id.noReviews)
     TextView noReviews;
+    Unbinder unbinder;
 
     private static final Gson gson = new Gson();
 
@@ -63,23 +67,37 @@ public class ShowEstablishment extends AppCompatActivity {
     private Review[] reviews = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.show_establishment);
-        ButterKnife.bind(this);
 
-        String pubId = getIntent().getStringExtra("pubId");
-        String restaurantId = getIntent().getStringExtra("restaurantId");
+        String pubId = getActivity().getIntent().getStringExtra("pubId");
+        String restaurantId = getActivity().getIntent().getStringExtra("restaurantId");
 
         if (pubId != null) {
             mongoAPI("/pubs/" + pubId, "GET");
         } else if (restaurantId != null) {
             mongoAPI("/restaurants/" + restaurantId, "GET");
         } else {
-            Toast.makeText(ShowEstablishment.this,
+            Toast.makeText(getActivity(),
                     "No se ha obtenido ID de establecimiento para mostrar",
                     Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.profile, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos auxiliares --------------------------------------------------------------------------
@@ -89,7 +107,7 @@ public class ShowEstablishment extends AppCompatActivity {
     }
 
     private void configReclyclerView() {
-        establishmentReviews.setLayoutManager(new LinearLayoutManager(this));
+        establishmentReviews.setLayoutManager(new LinearLayoutManager(getActivity()));
         establishmentReviews.setAdapter(adapter);
     }
 
@@ -107,13 +125,12 @@ public class ShowEstablishment extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.weStateHere:
                 // TODO
-                Toast.makeText(ShowEstablishment.this,
-                        "Por hacer",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Por hacer", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.newReview:
-                if(Preferences.obtenerPreferenceString(this, Preferences.PREFERENCE_USER_LOGIN).length() > 0){
-                    i = new Intent(this, CreateReview.class);
+                if(Preferences.obtenerPreferenceString(getActivity(),
+                        Preferences.PREFERENCE_USER_LOGIN).length() > 0){
+                    i = new Intent(getActivity(), CreateReview.class);
 
                     String name = null;
                     String id = null;
@@ -140,7 +157,7 @@ public class ShowEstablishment extends AppCompatActivity {
                     i.putExtra("nota_media", average.toString());
                     i.putExtra("tipo", type);
                 }else {
-                    Toast.makeText(ShowEstablishment.this,
+                    Toast.makeText(getActivity(),
                             "Debes de iniciar sesión para poder dejar una reseña",
                             Toast.LENGTH_LONG).show();
                 }
@@ -180,7 +197,7 @@ public class ShowEstablishment extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(ShowEstablishment.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Obteniendo establecimiento...");
             progressDialog.show();
         }
@@ -255,7 +272,7 @@ public class ShowEstablishment extends AppCompatActivity {
                     }
 
                 } catch (Throwable throwable1) { // En caso de que haya habido error, notifícamelo
-                    Toast.makeText(ShowEstablishment.this,
+                    Toast.makeText(getActivity(),
                             "Ha habido un problema con la aplicación",
                             Toast.LENGTH_LONG).show();
                 }
@@ -332,7 +349,7 @@ public class ShowEstablishment extends AppCompatActivity {
                     mongoAPI("/users/" + r.getAuthor(), "User");
 
             } catch (Throwable throwable) {
-                Toast.makeText(ShowEstablishment.this,
+                Toast.makeText(getActivity(),
                         "Ha habido un problema con la aplicación (2)",
                         Toast.LENGTH_LONG).show();
             }
@@ -417,7 +434,7 @@ public class ShowEstablishment extends AppCompatActivity {
                 }
 
             } catch (Throwable throwable) {
-                Toast.makeText(ShowEstablishment.this,
+                Toast.makeText(getActivity(),
                         "Ha habido un problema con la aplicación (3)",
                         Toast.LENGTH_LONG).show();
             }

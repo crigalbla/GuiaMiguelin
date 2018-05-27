@@ -1,14 +1,15 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -30,9 +31,10 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.User;
 
-public class Register extends AppCompatActivity {
+public class Register extends Fragment {
 
     @BindView(R.id.send)
     Button send;
@@ -66,16 +68,26 @@ public class Register extends AppCompatActivity {
     TextInputLayout tPassword;
     @BindView(R.id.tVerfyPassword)
     TextInputLayout tVerfyPassword;
+    Unbinder unbinder;
 
     private static final Gson gson = new Gson();
     private User newUser = new User();
     private User existUser = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.register);
-        ButterKnife.bind(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.register, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos auxiliares --------------------------------------------------------------------------
@@ -106,14 +118,16 @@ public class Register extends AppCompatActivity {
                     if (password.getText().toString().equals(verifyPassword.getText().toString())) {
                         mongoAPI("/users/exist?nick=" + nick.getText().toString(), "GET");
                     } else {
-                        Toast.makeText(this,
+                        Toast.makeText(getActivity(),
                                 "La contraseña y la verificación de contraseña no son iguales",
                                 Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
             case R.id.BTcancelRegister:
-                finish();
+                getActivity().setTitle("Iniciar sesión");
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, new Login()).commit();
                 break;
         }
     }
@@ -144,7 +158,7 @@ public class Register extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(Register.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Verificando datos...");
             progressDialog.show();
         }
@@ -167,7 +181,7 @@ public class Register extends AppCompatActivity {
             if (existUser == null) {
                     mongoAPI("/users/", "POST");
             } else {
-                Toast.makeText(Register.this,
+                Toast.makeText(getActivity(),
                         "El nombre de usuario " + existUser.getNick() + " ya existe",
                         Toast.LENGTH_LONG).show();
             }
@@ -222,7 +236,7 @@ public class Register extends AppCompatActivity {
             super.onPreExecute();
 
             // Esto no es mas que una ventana que dice el proceso de la tarea
-            progressDialog = new ProgressDialog(Register.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Creando usuario...");
             progressDialog.show();
         }
@@ -244,16 +258,12 @@ public class Register extends AppCompatActivity {
             super.onPostExecute(result);
 
             if(result != "Error de conexión" && result != "Datos incorrectos"){
-                finish();
-                Intent i = new Intent(Register.this, Login.class);
-                startActivity(i);
-                Toast.makeText(Register.this,
-                        "Usuario creado",
-                        Toast.LENGTH_LONG).show();
+                getActivity().setTitle("Iniciar sesión");
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, new Login()).commit();
+                Toast.makeText(getActivity(), "Usuario creado", Toast.LENGTH_LONG).show();
             }else{
-                Toast.makeText(Register.this,
-                        result,
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), result, Toast.LENGTH_LONG).show();
             }
 
             // Cerrar ventana de diálogo
