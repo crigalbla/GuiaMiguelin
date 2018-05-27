@@ -1,15 +1,22 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.design.widget.NavigationView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -25,9 +32,10 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.User;
 
-public class UserSearch extends AppCompatActivity implements OnItemClickListener2 {
+public class UserSearch extends Fragment implements OnItemClickListener2 {
 
     @BindView(R.id.search)
     EditText search;
@@ -35,16 +43,37 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
     Button searchButoon;
     @BindView(R.id.recycleUsers)
     RecyclerView recycleUsers;
+    Unbinder unbinder;
 
     private static final Gson gson = new Gson();
     private User[] users = null;
     private UserAdapter adapter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.user_search);
-        ButterKnife.bind(this);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.content_main, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        RecyclerView a = recycleUsers;
+        configAdapter();
+        configReclyclerView();
+        generateUser();
+
+        whatShow();
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos auxiliares --------------------------------------------------------------------------
@@ -57,7 +86,7 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
             a = adapter.getId(i);
 
             if(a.contains(b)){
-                Intent in = new Intent(UserSearch.this, Profile.class);
+                Intent in = new Intent(getActivity(), Profile.class);
                 in.putExtra("userId", a);
                 startActivity(in);
                 break;
@@ -70,7 +99,7 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
     }
 
     private void configReclyclerView() {
-        recycleUsers.setLayoutManager(new LinearLayoutManager(this));
+        recycleUsers.setLayoutManager(new LinearLayoutManager(getActivity()));
         recycleUsers.setAdapter(adapter);
     }
 
@@ -78,6 +107,37 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
 
         for (User u : users) {
             adapter.add(u);
+        }
+    }
+
+    private void whatShow() {
+        NavigationView navigationView = (NavigationView) getActivity().findViewById(R.id.nav_view);
+        View viewHeader = navigationView.inflateHeaderView(R.layout.nav_header_main);
+        Menu nav_Menu = navigationView.getMenu();
+
+        ImageView imageProfile = (ImageView) viewHeader.findViewById(R.id.imageProfile);
+        TextView nickProfile = (TextView) viewHeader.findViewById(R.id.nickProfile);
+        TextView fullNameProfile = (TextView) viewHeader.findViewById(R.id.fullNameProfile);
+
+        imageProfile.setVisibility(View.INVISIBLE);
+        nickProfile.setVisibility(View.INVISIBLE);
+        fullNameProfile.setVisibility(View.INVISIBLE);
+        nav_Menu.findItem(R.id.profile).setVisible(false);
+        nav_Menu.findItem(R.id.logout).setVisible(false);
+        nav_Menu.findItem(R.id.principal).setVisible(false);
+
+        if (Preferences.obtenerPreferenceString(getActivity(),
+                Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
+            nav_Menu.findItem(R.id.profile).setVisible(true);
+            nav_Menu.findItem(R.id.logout).setVisible(true);
+            nav_Menu.findItem(R.id.login).setVisible(false);
+            imageProfile.setVisibility(View.VISIBLE);
+            nickProfile.setVisibility(View.VISIBLE);
+            nickProfile.setText(Preferences.obtenerPreferenceString(getActivity(),
+                    Preferences.PREFERENCE_USER_NICK));
+            fullNameProfile.setVisibility(View.VISIBLE);
+            fullNameProfile.setText(Preferences.obtenerPreferenceString(getActivity(),
+                    Preferences.PREFERENCE_USER_FULL_NAME));
         }
     }
 
@@ -91,7 +151,7 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
         if (searchString != "") {
             mongoAPI("/users/search?search=" + searchString, "GET");
         } else {
-            Toast.makeText(UserSearch.this, "Introduzca una búsqueda válida",
+            Toast.makeText(getActivity(), "Introduzca una búsqueda válida",
                     Toast.LENGTH_SHORT).show();
         }
     }
@@ -119,7 +179,7 @@ public class UserSearch extends AppCompatActivity implements OnItemClickListener
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(UserSearch.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Buscado usuarios...");
             progressDialog.show();
         }
