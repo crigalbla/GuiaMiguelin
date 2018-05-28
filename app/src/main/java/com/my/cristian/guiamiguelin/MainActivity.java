@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            toolbar.setTitle("Guía Miguelín");
         }
     }
 
@@ -67,15 +68,18 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
         Intent i = null;
 
+        for(int e=0; e < getFragmentManager().getBackStackEntryCount(); e++)
+            getFragmentManager().popBackStack();
+
         if (id == R.id.profile) {
             toolbar.setTitle("Perfil de usuario");
             android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new Profile());
+            transaction.replace(R.id.contenedor, new Profile()).addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.login) {
             toolbar.setTitle("Iniciar sesión");
             android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new Login());
+            transaction.replace(R.id.contenedor, new Login()).addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.logout) {
             Preferences.savePreferenceString(this, "",
@@ -93,19 +97,21 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.principal) {
             toolbar.setTitle("Guía Miguelín");
             android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new ContentMain());
+            transaction.replace(R.id.contenedor, new ContentMain()).addToBackStack(null);
             transaction.commit();
+            // Para que no me cree dos veces el contentMain si ya estoy en el contentMain
+            getFragmentManager().popBackStack();
         } else if (id == R.id.maps) {
             i = new Intent(this, GoogleMaps.class);
         } else if (id == R.id.search_user) {
             toolbar.setTitle("Búscaqueda de usuarios");
             android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new UserSearch());
+            transaction.replace(R.id.contenedor, new UserSearch()).addToBackStack(null);
             transaction.commit();
         } else if (id == R.id.search_estab) {
             toolbar.setTitle("Búscaqueda de establecimientos");
             android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new EstablishmentSearch());
+            transaction.replace(R.id.contenedor, new EstablishmentSearch()).addToBackStack(null);
             transaction.commit();
         }
         if (i != null)

@@ -62,8 +62,10 @@ public class Profile extends Fragment {
     private boolean follow = false;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.profile, container, false);
 
         userIdLogged = Preferences.obtenerPreferenceString(getActivity(),
                 Preferences.PREFERENCE_USER_LOGIN);
@@ -74,13 +76,6 @@ public class Profile extends Fragment {
         }else{
             mongoAPI("/users/" + userIdLogged, "GET");
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.profile, container, false);
 
         unbinder = ButterKnife.bind(this, view);
         return view;
@@ -107,12 +102,12 @@ public class Profile extends Fragment {
             }else if(userId.equals(userIdLogged)){
                 getActivity().setTitle("Editar perfil");
                 getActivity().getFragmentManager().beginTransaction()
-                        .replace(R.id.contenedor, new EditProfile()).commit();
+                        .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
             }
         }else{
             getActivity().setTitle("Editar perfil");
             getActivity().getFragmentManager().beginTransaction()
-                    .replace(R.id.contenedor, new EditProfile()).commit();
+                    .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
         }
     }
 

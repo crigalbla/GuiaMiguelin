@@ -107,15 +107,11 @@ public class EditProfile extends Fragment {
                         validations(etSurnames, tSurnames, "Rellenar apellidos")){
                     mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                             Preferences.PREFERENCE_USER_LOGIN), "PUT");
-                    getActivity().setTitle("Perfil de usuario");
-                    getActivity().getFragmentManager().beginTransaction()
-                            .replace(R.id.contenedor, new Profile()).commit();
+                    getActivity().onBackPressed();
                 }
                 break;
             case R.id.BTcancelEdit:
-                getActivity().setTitle("Perfil de usario");
-                getActivity().getFragmentManager().beginTransaction()
-                        .replace(R.id.contenedor, new Profile()).commit();
+                getActivity().onBackPressed();
                 break;
         }
     }

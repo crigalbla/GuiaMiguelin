@@ -42,6 +42,8 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
 
     private static final Gson gson = new Gson();
     private User[] users = null;
+    private String searchString = null;
+
     private UserAdapter adapter;
 
     @Override
@@ -51,6 +53,10 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         View view = inflater.inflate(R.layout.user_search, container, false);
 
         unbinder = ButterKnife.bind(this, view);
+        //Esto es para que recargue la busqueda cuando le doy al botón back
+        if(searchString != null && searchString.length() > 0) {
+            mongoAPI("/users/search?search=" + searchString, "GET");
+        }
         return view;
     }
 
@@ -76,7 +82,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
                 args.putString("userId", a);
                 fragment.setArguments(args);
                 getActivity().getFragmentManager().beginTransaction()
-                        .replace(R.id.contenedor, fragment).commit();
+                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
                 break;
             }
         }
@@ -102,7 +108,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
 
     @OnClick(R.id.searchButoon)
     public void searchOnClick() {
-        String searchString = search.getText().toString().replaceAll("^\\s*", "");
+        searchString = search.getText().toString().replaceAll("^\\s*", "");
         searchString = searchString.replaceAll("\\s*$", "");
 
         if (searchString != "") {
