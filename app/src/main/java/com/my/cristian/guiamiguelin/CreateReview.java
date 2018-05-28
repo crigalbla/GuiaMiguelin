@@ -1,13 +1,14 @@
 package com.my.cristian.guiamiguelin;
 
 import android.annotation.SuppressLint;
+import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TextInputEditText;
-import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,12 +34,13 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import domain.Pub;
 import domain.Restaurant;
 import domain.Review;
 import domain.User;
 
-public class CreateReview extends AppCompatActivity {
+public class CreateReview extends Fragment {
 
     @BindView(R.id.reviewEstabl)
     TextView reviewEstabl;
@@ -46,6 +48,7 @@ public class CreateReview extends AppCompatActivity {
     EditText reviewPuntuation;
     @BindView(R.id.reviewCommet)
     TextInputEditText reviewCommet;
+    Unbinder unbinder;
 
     private static final Gson gson = new Gson();
     private Review newReview = new Review();
@@ -54,12 +57,22 @@ public class CreateReview extends AppCompatActivity {
     private User putUser = new User();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.create_review);
-        ButterKnife.bind(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        reviewEstabl.setText(getIntent().getStringExtra("nombre_establecimiento"));
+        View view = inflater.inflate(R.layout.create_review, container, false);
+
+        unbinder = ButterKnife.bind(this, view);
+        String nombreEstablecimiento = getArguments() != null ?
+                (String) getArguments().get("nombre_establecimiento") : null;
+        reviewEstabl.setText(nombreEstablecimiento);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos auxiliares --------------------------------------------------------------------------
@@ -71,17 +84,17 @@ public class CreateReview extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.sendReview:
                 if (reviewPuntuation.getText().toString().length() == 0) {
-                    Toast.makeText(this, "Introduzca una puntuación",
+                    Toast.makeText(getActivity(), "Introduzca una puntuación",
                             Toast.LENGTH_SHORT).show();
                 } else if (reviewPuntuation.getText().toString().length() > 1){
-                    Toast.makeText(this, "La puntuación debe de ser de 0 a 5",
+                    Toast.makeText(getActivity(), "La puntuación debe de ser de 0 a 5",
                             Toast.LENGTH_LONG).show();
                 } else {
                     mongoAPI("/reviews/", "POST");
                 }
                 break;
             case R.id.cancelReview:
-                finish();
+                getActivity().onBackPressed();
                 break;
         }
     }
@@ -119,7 +132,7 @@ public class CreateReview extends AppCompatActivity {
             super.onPreExecute();
 
             // Esto no es mas que una ventana que dice el proceso de la tarea
-            progressDialog = new ProgressDialog(CreateReview.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Enviando reseña...");
             progressDialog.show();
         }
@@ -140,8 +153,12 @@ public class CreateReview extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            mongoAPI(getIntent().getStringExtra("tipo") +
-                    getIntent().getStringExtra("id_establecimiento"), "ESTABLISHMENT");
+            String tipo = getArguments() != null ?
+                    (String) getArguments().get("tipo") : null;
+            String idEstablecimiento = getArguments() != null ?
+                    (String) getArguments().get("id_establecimiento") : null;
+
+            mongoAPI(tipo + idEstablecimiento, "ESTABLISHMENT");
 
             if (progressDialog != null) {
                 progressDialog.dismiss();
@@ -155,10 +172,13 @@ public class CreateReview extends AppCompatActivity {
             BufferedReader bufferedReader = null;
 
             try {
+                String idEstablecimiento = getArguments() != null ?
+                        (String) getArguments().get("id_establecimiento") : null;
+
                 // Creo datos para enviarlos al servidor
-                newReview.setAuthor(Preferences.obtenerPreferenceString(CreateReview.this,
+                newReview.setAuthor(Preferences.obtenerPreferenceString(getActivity(),
                         Preferences.PREFERENCE_USER_LOGIN));
-                newReview.setEstablishment(getIntent().getStringExtra("id_establecimiento"));
+                newReview.setEstablishment(idEstablecimiento);
                 newReview.setPuntuation(new Integer(reviewPuntuation.getText().toString()) );
                 if(reviewCommet.getText().toString().length() > 0)
                     newReview.setComment(reviewCommet.getText().toString());
@@ -214,7 +234,7 @@ public class CreateReview extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(CreateReview.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Enviando reseña...");
             progressDialog.show();
         }
@@ -234,7 +254,7 @@ public class CreateReview extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            mongoAPI("/users/" + Preferences.obtenerPreferenceString(CreateReview.this,
+            mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                     Preferences.PREFERENCE_USER_LOGIN), "GET-USER");
 
             if (progressDialog != null) {
@@ -247,18 +267,24 @@ public class CreateReview extends AppCompatActivity {
             BufferedWriter bufferedWriter = null;
 
             try {
+                String reseñas = getArguments() != null ?
+                        (String) getArguments().get("reseñas") : null;
+                String notaMedia = getArguments() != null ?
+                        (String) getArguments().get("nota_media") : null;
+                String tipo = getArguments() != null ?
+                        (String) getArguments().get("tipo") : null;
                 // Creo los datos a actualizar
                 String dataToSend = "";
                 List<String> reviews = new ArrayList<String>();
                 Double newAverage = newReview.getPuntuation().doubleValue();
                 // La lista de reseñas vacía solo contiene [], asi que compruebo eso
-                if(getIntent().getStringExtra("reseñas").length() > 2){
-                    reviews.addAll(Arrays.asList(getIntent().getStringExtra("reseñas")
+                if(reseñas.length() > 2){ // TODO esto no funciona del todo bien, corregir
+                    reviews.addAll(Arrays.asList(reseñas
                             .replace("[", "").replace("]", "")
                             .replace(" ", "")
                             .split(",")));
                     Integer puntuation = newReview.getPuntuation();
-                    Double average = new Double( getIntent().getStringExtra("nota_media") );
+                    Double average = new Double(notaMedia);
                     Integer numberOfReviews = reviews.size();
                     Double variable = average / numberOfReviews;
                     newAverage = variable*(numberOfReviews-1) + puntuation/numberOfReviews;
@@ -267,12 +293,12 @@ public class CreateReview extends AppCompatActivity {
                 }
                 reviews.add(newReview.getId());
 
-                if(getIntent().getStringExtra("tipo").equals("/pubs/")){
+                if(tipo.equals("/pubs/")){
                     putPub.setReviews(reviews);
                     putPub.setAverage(newAverage);
                     dataToSend = gson.toJson(putPub);
                 }
-                if(getIntent().getStringExtra("tipo").equals("/restaurants/")){
+                if(tipo.equals("/restaurants/")){
                     putRestaurant.setReviews(reviews);
                     putRestaurant.setAverage(newAverage);
                     dataToSend = gson.toJson(putRestaurant);
@@ -319,7 +345,7 @@ public class CreateReview extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(CreateReview.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Enviando reseña...");
             progressDialog.show();
         }
@@ -341,7 +367,7 @@ public class CreateReview extends AppCompatActivity {
             User user = gson.fromJson(result, User.class);
             putUser.setReviews(user.getReviews());  // Solo me hacen falta las reviews
 
-            mongoAPI("/users/" + Preferences.obtenerPreferenceString(CreateReview.this,
+            mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                     Preferences.PREFERENCE_USER_LOGIN), "PUT-USER");
 
             if (progressDialog != null) {
@@ -392,7 +418,7 @@ public class CreateReview extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(CreateReview.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Enviando reseña...");
             progressDialog.show();
         }
@@ -412,17 +438,8 @@ public class CreateReview extends AppCompatActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            Intent i = new Intent(CreateReview.this, ShowEstablishment.class);
-            String cadena = null;
-            // Si tiene por ejemplo la media, es que es ese tipo de establecimiento el que se ah editado
-            if(putPub.getAverage() != null)
-                cadena = "pubId";
-            if(putRestaurant.getAverage() != null)
-                cadena = "restaurantId";
-
-            finish();
-            i.putExtra(cadena, newReview.getEstablishment());
-            startActivity(i);
+            // Para terminar volemos a la actividad anterior, ahora debe de aparecer la reseña
+            getActivity().onBackPressed();
 
             if (progressDialog != null) {
                 progressDialog.dismiss();

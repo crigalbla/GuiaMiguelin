@@ -36,20 +36,6 @@
         <activity
             android:name=".GoogleMaps"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".MongoDB"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ShowEstablishment"
-            android:label="Establecimiento"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".CreateReview"
-            android:label="Crear reseña"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

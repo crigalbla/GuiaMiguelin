@@ -3,7 +3,6 @@ package com.my.cristian.guiamiguelin;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatTextView;
@@ -67,11 +66,15 @@ public class ShowEstablishment extends Fragment {
     private Review[] reviews = null;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        String pubId = getActivity().getIntent().getStringExtra("pubId");
-        String restaurantId = getActivity().getIntent().getStringExtra("restaurantId");
+        View view = inflater.inflate(R.layout.show_establishment, container, false);
+
+        String pubId = getArguments() != null ?
+                (String) getArguments().get("pubId") : null;
+        String restaurantId = getArguments() != null ?
+                (String) getArguments().get("restaurantId") : null;
 
         if (pubId != null) {
             mongoAPI("/pubs/" + pubId, "GET");
@@ -82,13 +85,6 @@ public class ShowEstablishment extends Fragment {
                     "No se ha obtenido ID de establecimiento para mostrar",
                     Toast.LENGTH_LONG).show();
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.profile, container, false);
 
         unbinder = ButterKnife.bind(this, view);
         return view;
@@ -121,7 +117,6 @@ public class ShowEstablishment extends Fragment {
 
     @OnClick({R.id.weStateHere, R.id.newReview})
     public void onViewClicked(View view) {
-        Intent i = null;
         switch (view.getId()) {
             case R.id.weStateHere:
                 // TODO
@@ -130,32 +125,27 @@ public class ShowEstablishment extends Fragment {
             case R.id.newReview:
                 if(Preferences.obtenerPreferenceString(getActivity(),
                         Preferences.PREFERENCE_USER_LOGIN).length() > 0){
-                    i = new Intent(getActivity(), CreateReview.class);
 
-                    String name = null;
-                    String id = null;
-                    String reviews = null;
-                    String type = null;
-                    Double average = null;
+                    getActivity().setTitle("Crear reseña");
+                    Fragment fragment = new CreateReview();
+                    Bundle args = new Bundle();
                     if (pub != null) {
-                        name = pub.getName();
-                        id = pub.getId();
-                        reviews = pub.getReviews().toString();
-                        type = "/pubs/";
-                        average = pub.getAverage();
+                        args.putString("nombre_establecimiento", pub.getName());
+                        args.putString("id_establecimiento", pub.getId());
+                        args.putString("reseñas", pub.getReviews().toString());
+                        args.putString("tipo", "/pubs/");
+                        args.putString("nota_media", pub.getAverage().toString());
                     }
                     if (restaurant != null) {
-                        name = restaurant.getName();
-                        id = restaurant.getId();
-                        reviews = restaurant.getReviews().toString();
-                        type = "/restaurants/";
-                        average = restaurant.getAverage();
+                        args.putString("nombre_establecimiento", restaurant.getName());
+                        args.putString("id_establecimiento", restaurant.getId());
+                        args.putString("reseñas", restaurant.getReviews().toString());
+                        args.putString("tipo", "/restaurants/");
+                        args.putString("nota_media", restaurant.getAverage().toString());
                     }
-                    i.putExtra("nombre_establecimiento", name);
-                    i.putExtra("id_establecimiento", id);
-                    i.putExtra("reseñas", reviews);
-                    i.putExtra("nota_media", average.toString());
-                    i.putExtra("tipo", type);
+                    fragment.setArguments(args);
+                    getActivity().getFragmentManager().beginTransaction()
+                            .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
                 }else {
                     Toast.makeText(getActivity(),
                             "Debes de iniciar sesión para poder dejar una reseña",
@@ -163,9 +153,6 @@ public class ShowEstablishment extends Fragment {
                 }
                 break;
         }
-
-        if(i != null)
-            startActivity(i);
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -265,7 +252,7 @@ public class ShowEstablishment extends Fragment {
                     if (phone != null)
                         establishmentPhone.setText(phone.toString());
 
-                    if (pub.getReviews().size() > 0) {
+                    if (restaurant.getReviews().size() > 0) {
                         noReviews.setVisibility(View.INVISIBLE);
                         mongoAPI("/reviews/byEstablishment/" + restaurant.getId(),
                                 "Reviews");
@@ -431,6 +418,7 @@ public class ShowEstablishment extends Fragment {
                     configAdapter();
                     configReclyclerView();
                     generateReviews();
+                    count2 = 0;
                 }
 
             } catch (Throwable throwable) {

@@ -3,7 +3,6 @@ package com.my.cristian.guiamiguelin;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,11 +47,11 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
     LinearLayout layoutRestaurant;
     Unbinder unbinder;
 
-
     private static final Gson gson = new Gson();
 
     private Pub[] pubs = null;
     private Restaurant[] restaurants = null;
+    private String searchString = null;
 
     private EstablishmentAdapter adapter1;
     private EstablishmentAdapter adapter2;
@@ -64,6 +63,11 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         View view = inflater.inflate(R.layout.establishment_search, container, false);
 
         unbinder = ButterKnife.bind(this, view);
+        //Esto es para que recargue la busqueda cuando le doy al botón back
+        if(searchString != null && searchString.length() > 0) {
+            mongoAPI("/pubs/search?search=" + searchString, "pub");
+            mongoAPI("/restaurants/search?search=" + searchString, "restaurant");
+        }
         return view;
     }
 
@@ -85,9 +89,13 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
             a = adapter1.getId(i);
 
             if(a.contains(b)){
-                Intent in = new Intent(getActivity(), ShowEstablishment.class);
-                in.putExtra("pubId", a);
-                startActivity(in);
+                getActivity().setTitle("Bar");
+                Fragment fragment = new ShowEstablishment();
+                Bundle args = new Bundle();
+                args.putString("pubId", a);
+                fragment.setArguments(args);
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
 
                 entrar = false;
                 break;
@@ -99,9 +107,13 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
             a = adapter2.getId(i);
 
             if(a.contains(b)){
-                Intent in = new Intent(getActivity(), ShowEstablishment.class);
-                in.putExtra("restaurantId", a);
-                startActivity(in);
+                getActivity().setTitle("Restaurante");
+                Fragment fragment = new ShowEstablishment();
+                Bundle args = new Bundle();
+                args.putString("restaurantId", a);
+                fragment.setArguments(args);
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
 
                 break;
             }
@@ -135,7 +147,7 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
 
     @OnClick(R.id.searchButoon)
     public void onViewClicked() {
-        String searchString = search.getText().toString().replaceAll("^\\s*", "");
+        searchString = search.getText().toString().replaceAll("^\\s*", "");
         searchString = searchString.replaceAll("\\s*$", "");
 
         if (searchString != "") {
