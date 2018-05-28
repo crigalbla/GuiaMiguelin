@@ -1,5 +1,6 @@
 package com.my.cristian.guiamiguelin;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -67,20 +68,19 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         Intent i = null;
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        Fragment fragment = null;
+        boolean entra = false;
 
         for(int e=0; e < getFragmentManager().getBackStackEntryCount(); e++)
             getFragmentManager().popBackStack();
 
         if (id == R.id.profile) {
             toolbar.setTitle("Perfil de usuario");
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new Profile()).addToBackStack(null);
-            transaction.commit();
+            fragment = new Profile();
         } else if (id == R.id.login) {
             toolbar.setTitle("Iniciar sesión");
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new Login()).addToBackStack(null);
-            transaction.commit();
+            fragment = new Login();
         } else if (id == R.id.logout) {
             Preferences.savePreferenceString(this, "",
                     Preferences.PREFERENCE_USER_LOGIN);
@@ -89,33 +89,39 @@ public class MainActivity extends AppCompatActivity
             Preferences.savePreferenceString(this, "",
                     Preferences.PREFERENCE_USER_FULL_NAME);
             toolbar.setTitle("Guía Miguelín");
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new ContentMain());
-            transaction.commit();
+            fragment = new ContentMain();
             Toast.makeText(this,"Sesión cerrada",
                     Toast.LENGTH_LONG).show();
         } else if (id == R.id.principal) {
             toolbar.setTitle("Guía Miguelín");
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new ContentMain()).addToBackStack(null);
-            transaction.commit();
-            // Para que no me cree dos veces el contentMain si ya estoy en el contentMain
-            getFragmentManager().popBackStack();
+            fragment = new ContentMain();
+            entra = true;
         } else if (id == R.id.maps) {
             i = new Intent(this, GoogleMaps.class);
         } else if (id == R.id.search_user) {
             toolbar.setTitle("Búscaqueda de usuarios");
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new UserSearch()).addToBackStack(null);
-            transaction.commit();
+            fragment = new UserSearch();
+            // Hago que el item se seleccione
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            MenuItem itemSearch = navigationView.getMenu().findItem(R.id.search_user);
+            itemSearch.setCheckable(true);
+            itemSearch.setChecked(true);
         } else if (id == R.id.search_estab) {
             toolbar.setTitle("Búscaqueda de establecimientos");
-            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.replace(R.id.contenedor, new EstablishmentSearch()).addToBackStack(null);
-            transaction.commit();
+            fragment = new EstablishmentSearch();
+            // Hago que el item se seleccione
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            MenuItem itemSearch = navigationView.getMenu().findItem(R.id.search_estab);
+            itemSearch.setCheckable(true);
+            itemSearch.setChecked(true);
         }
         if (i != null)
             startActivity(i);
+        if(fragment != null){
+            transaction.replace(R.id.contenedor, fragment).addToBackStack(null).commit();
+            if(entra)
+                getFragmentManager().popBackStack(); // Esto es para que la vista contentMain no se repita
+        }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

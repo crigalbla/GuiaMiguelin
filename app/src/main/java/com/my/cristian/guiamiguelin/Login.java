@@ -89,10 +89,9 @@ public class Login extends Fragment {
             Preferences.savePreferenceString(getActivity(), userLogged.getName() + ", " +
                             userLogged.getSurname(), Preferences.PREFERENCE_USER_FULL_NAME);
 
-
-            getActivity().setTitle("Guía Miguelín");
-            getActivity().getFragmentManager().beginTransaction()
-                    .replace(R.id.contenedor, new ContentMain()).commit();
+            Toast.makeText(getActivity(),"Sesión iniciada",
+                    Toast.LENGTH_SHORT).show();
+            getActivity().onBackPressed();
         } else { // Si el usuario no existe
             Toast.makeText(getActivity(),"Nick de usuario o contraseña incorrecto",
                     Toast.LENGTH_SHORT).show();
@@ -103,7 +102,7 @@ public class Login extends Fragment {
     public void onViewClicked() {
         getActivity().setTitle("Reguistrar usuario");
         getActivity().getFragmentManager().beginTransaction()
-                .replace(R.id.contenedor, new Register()).commit();
+                .replace(R.id.contenedor, new Register()).addToBackStack(null).commit();
     }
 
     // Peticiones a la API -------------------------------------------------------------------------

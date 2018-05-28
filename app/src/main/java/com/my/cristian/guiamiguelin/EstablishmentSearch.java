@@ -51,7 +51,8 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
 
     private Pub[] pubs = null;
     private Restaurant[] restaurants = null;
-    private String searchString = null;
+    private String resultPub = null;
+    private String resultRestaurant = null;
 
     private EstablishmentAdapter adapter1;
     private EstablishmentAdapter adapter2;
@@ -64,9 +65,13 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
 
         unbinder = ButterKnife.bind(this, view);
         //Esto es para que recargue la busqueda cuando le doy al botón back
-        if(searchString != null && searchString.length() > 0) {
-            mongoAPI("/pubs/search?search=" + searchString, "pub");
-            mongoAPI("/restaurants/search?search=" + searchString, "restaurant");
+        if(resultPub != null && resultPub.length() > 0 &&
+                resultRestaurant != null && resultRestaurant.length() > 0) {
+            pubs = gson.fromJson(resultPub, Pub[].class);
+            restaurants = gson.fromJson(resultRestaurant, Restaurant[].class);
+            configAdapter();
+            configReclyclerView();
+            generateEstablishment();
         }
         return view;
     }
@@ -147,7 +152,7 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
 
     @OnClick(R.id.searchButoon)
     public void onViewClicked() {
-        searchString = search.getText().toString().replaceAll("^\\s*", "");
+        String searchString = search.getText().toString().replaceAll("^\\s*", "");
         searchString = searchString.replaceAll("\\s*$", "");
 
         if (searchString != "") {
@@ -203,6 +208,10 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+
+            // Guardo el resultado ya que me hará falta cuando pulse el botón back para no hacer
+            // de nuevo la búsqueda.
+            resultPub = result;
 
             pubs = gson.fromJson(result, Pub[].class);
 
@@ -273,6 +282,10 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+
+            // Guardo el resultado ya que me hará falta cuando pulse el botón back para no hacer
+            // de nuevo la búsqueda.
+            resultRestaurant = result;
 
             restaurants = gson.fromJson(result, Restaurant[].class);
 

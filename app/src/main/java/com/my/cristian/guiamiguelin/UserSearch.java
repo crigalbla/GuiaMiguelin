@@ -42,7 +42,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
 
     private static final Gson gson = new Gson();
     private User[] users = null;
-    private String searchString = null;
+    private String result2 = null;
 
     private UserAdapter adapter;
 
@@ -54,8 +54,11 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
 
         unbinder = ButterKnife.bind(this, view);
         //Esto es para que recargue la busqueda cuando le doy al botón back
-        if(searchString != null && searchString.length() > 0) {
-            mongoAPI("/users/search?search=" + searchString, "GET");
+        if(result2 != null && result2.length() > 0) {
+            users = gson.fromJson(result2, User[].class);
+            configAdapter();
+            configReclyclerView();
+            generateUser();
         }
         return view;
     }
@@ -108,7 +111,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
 
     @OnClick(R.id.searchButoon)
     public void searchOnClick() {
-        searchString = search.getText().toString().replaceAll("^\\s*", "");
+        String searchString = search.getText().toString().replaceAll("^\\s*", "");
         searchString = searchString.replaceAll("\\s*$", "");
 
         if (searchString != "") {
@@ -126,7 +129,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         // Local http://192.168.1.106:1234/
         switch (type) {
             case ("GET"):
-                new UserSearch.GetDataTask1().execute(URL_BASE + url);
+                new UserSearch.GetDataTask().execute(URL_BASE + url);
                 break;
         }
     }
@@ -134,7 +137,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
     // GET pubs ------------------------------------------------------------------------------------
 
     @SuppressLint("StaticFieldLeak")
-    class GetDataTask1 extends AsyncTask<String, Void, String> {
+    class GetDataTask extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
 
@@ -160,6 +163,10 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+
+            // Guardo el resultado ya que me hará falta cuando pulse el botón back para no hacer
+            // de nuevo la búsqueda.
+            result2 = result;
 
             users = gson.fromJson(result, User[].class);
 

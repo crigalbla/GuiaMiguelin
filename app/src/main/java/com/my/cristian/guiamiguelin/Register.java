@@ -125,9 +125,7 @@ public class Register extends Fragment {
                 }
                 break;
             case R.id.BTcancelRegister:
-                getActivity().setTitle("Iniciar sesión");
-                getActivity().getFragmentManager().beginTransaction()
-                        .replace(R.id.contenedor, new Login()).commit();
+                getActivity().onBackPressed();
                 break;
         }
     }
@@ -258,10 +256,8 @@ public class Register extends Fragment {
             super.onPostExecute(result);
 
             if(result != "Error de conexión" && result != "Datos incorrectos"){
-                getActivity().setTitle("Iniciar sesión");
-                getActivity().getFragmentManager().beginTransaction()
-                        .replace(R.id.contenedor, new Login()).commit();
                 Toast.makeText(getActivity(), "Usuario creado", Toast.LENGTH_LONG).show();
+                getActivity().onBackPressed();
             }else{
                 Toast.makeText(getActivity(), result, Toast.LENGTH_LONG).show();
             }
