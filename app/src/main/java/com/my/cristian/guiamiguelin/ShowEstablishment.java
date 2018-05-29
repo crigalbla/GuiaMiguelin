@@ -5,6 +5,8 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -53,6 +55,8 @@ public class ShowEstablishment extends Fragment {
     RecyclerView establishmentReviews;
     @BindView(R.id.noReviews)
     TextView noReviews;
+    @BindView(R.id.swipe_container)
+    SwipeRefreshLayout swipeContainer;
     Unbinder unbinder;
 
     private static final Gson gson = new Gson();
@@ -72,25 +76,20 @@ public class ShowEstablishment extends Fragment {
         View view = inflater.inflate(R.layout.show_establishment, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        String pubId = getArguments() != null ?
-                (String) getArguments().get("pubId") : null;
-        String restaurantId = getArguments() != null ?
-                (String) getArguments().get("restaurantId") : null;
-
-        if(pub != null && pub.getTypePub() != null){ // Casos en el que estoy pulsando back
-            continuePub();
-        }else if(restaurant != null && restaurant.getTypeRestaurant() != null){
-            continueRestaurant();
-        }else{ // Caso normal en el que entro por primera vez a la vista
-            if (pubId != null) {
-                mongoAPI("/pubs/" + pubId, "GET");
-            } else if (restaurantId != null) {
-                mongoAPI("/restaurants/" + restaurantId, "GET");
-            } else {
-                Toast.makeText(getActivity(),
-                        "No se ha obtenido ID de establecimiento para mostrar",
-                        Toast.LENGTH_LONG).show();
+        // Esto es un listener para refrescar la vista
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshContent();
             }
+        });
+
+        if (pub != null && pub.getTypePub() != null) { // Casos en el que estoy pulsando back
+            continuePub();
+        } else if (restaurant != null && restaurant.getTypeRestaurant() != null) {
+            continueRestaurant();
+        } else { // Caso normal en el que entro por primera vez a la vista
+            firstOrRecharge();
         }
 
         return view;
@@ -119,6 +118,34 @@ public class ShowEstablishment extends Fragment {
         }
     }
 
+    private void refreshContent(){
+        new Handler().postDelayed(new Runnable() {
+            @Override public void run() {
+                reviews = null;
+                firstOrRecharge();
+                swipeContainer.setRefreshing(false);
+            }
+        }, 1000);
+
+    }
+
+    private void firstOrRecharge(){
+        String pubId = getArguments() != null ?
+                (String) getArguments().get("pubId") : null;
+        String restaurantId = getArguments() != null ?
+                (String) getArguments().get("restaurantId") : null;
+
+        if (pubId != null) {
+            mongoAPI("/pubs/" + pubId, "GET");
+        } else if (restaurantId != null) {
+            mongoAPI("/restaurants/" + restaurantId, "GET");
+        } else {
+            Toast.makeText(getActivity(),
+                    "No se ha obtenido ID de establecimiento para mostrar",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
     // Botones -------------------------------------------------------------------------------------
 
     @OnClick({R.id.weStateHere, R.id.newReview})
@@ -129,8 +156,8 @@ public class ShowEstablishment extends Fragment {
                 Toast.makeText(getActivity(), "Por hacer", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.newReview:
-                if(Preferences.obtenerPreferenceString(getActivity(),
-                        Preferences.PREFERENCE_USER_LOGIN).length() > 0){
+                if (Preferences.obtenerPreferenceString(getActivity(),
+                        Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
 
                     getActivity().setTitle("Crear reseña");
                     Fragment fragment = new CreateReview();
@@ -152,7 +179,7 @@ public class ShowEstablishment extends Fragment {
                     fragment.setArguments(args);
                     getActivity().getFragmentManager().beginTransaction()
                             .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
-                }else {
+                } else {
                     Toast.makeText(getActivity(),
                             "Debes de iniciar sesión para poder dejar una reseña",
                             Toast.LENGTH_LONG).show();
@@ -263,7 +290,7 @@ public class ShowEstablishment extends Fragment {
         }
     }
 
-    private void continuePub(){
+    private void continuePub() {
         String type = pub.getTypePub().toString();
         type = type.replaceAll("_", " ");
         establishmentName.setText(pub.getName());
@@ -284,17 +311,17 @@ public class ShowEstablishment extends Fragment {
 
         if (pub.getReviews().size() > 0) {
             noReviews.setVisibility(View.INVISIBLE);
-            if(reviews != null){ // Casos en el que estoy pulsando back
+            if (reviews != null) { // Casos en el que estoy pulsando back
                 configAdapter();
                 configReclyclerView();
                 generateReviews();
-            }else {
+            } else {
                 mongoAPI("/reviews/byEstablishment/" + pub.getId(), "Reviews");
             }
         }
     }
 
-    private void continueRestaurant(){
+    private void continueRestaurant() {
         String type = restaurant.getTypeRestaurant().toString();
         type = type.replaceAll("_", " ");
         establishmentName.setText(restaurant.getName());
@@ -317,12 +344,12 @@ public class ShowEstablishment extends Fragment {
 
         if (restaurant.getReviews().size() > 0) {
             noReviews.setVisibility(View.INVISIBLE);
-            if(reviews != null){ // Casos en el que estoy pulsando back
+            if (reviews != null) { // Casos en el que estoy pulsando back
                 configAdapter();
                 configReclyclerView();
                 generateReviews();
-            }else{
-                mongoAPI("/reviews/byEstablishment/" + restaurant.getId(),"Reviews");
+            } else {
+                mongoAPI("/reviews/byEstablishment/" + restaurant.getId(), "Reviews");
             }
         }
     }

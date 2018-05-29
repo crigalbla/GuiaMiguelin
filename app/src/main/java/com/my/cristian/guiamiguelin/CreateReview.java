@@ -269,16 +269,19 @@ public class CreateReview extends Fragment {
             try {
                 String reseñas = getArguments() != null ?
                         (String) getArguments().get("reseñas") : null;
+                if(reseñas.equals("[]"))
+                    reseñas = null;
                 String notaMedia = getArguments() != null ?
                         (String) getArguments().get("nota_media") : null;
                 String tipo = getArguments() != null ?
                         (String) getArguments().get("tipo") : null;
+
                 // Creo los datos a actualizar
                 String dataToSend = "";
                 List<String> reviews = new ArrayList<String>();
                 Double newAverage = newReview.getPuntuation().doubleValue();
-                // La lista de reseñas vacía solo contiene [], asi que compruebo eso
-                if(reseñas.length() > 2){ // TODO esto no funciona del todo bien, corregir
+                // Esto es en siempre que haya al menos una reseña
+                if(reseñas != null){
                     reviews.addAll(Arrays.asList(reseñas
                             .replace("[", "").replace("]", "")
                             .replace(" ", "")
@@ -286,8 +289,8 @@ public class CreateReview extends Fragment {
                     Integer puntuation = newReview.getPuntuation();
                     Double average = new Double(notaMedia);
                     Integer numberOfReviews = reviews.size();
-                    Double variable = average / numberOfReviews;
-                    newAverage = variable*(numberOfReviews-1) + puntuation/numberOfReviews;
+                    Double sumPuntuations = average*numberOfReviews;
+                    newAverage = (sumPuntuations + puntuation) / (numberOfReviews + 1);
                     DecimalFormat df = new DecimalFormat("#.##");
                     newAverage = new Double( df.format(newAverage).replace(",", ".") );
                 }
@@ -439,6 +442,9 @@ public class CreateReview extends Fragment {
             super.onPostExecute(result);
 
             // Para terminar volemos a la actividad anterior, ahora debe de aparecer la reseña
+            Toast.makeText(getActivity(), "Reseña creada, refresca la vista haciendo scroll " +
+                            "para ver",
+                    Toast.LENGTH_LONG).show();
             getActivity().onBackPressed();
 
             if (progressDialog != null) {
