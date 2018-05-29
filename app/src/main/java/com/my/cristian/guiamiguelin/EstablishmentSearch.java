@@ -51,8 +51,6 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
 
     private Pub[] pubs = null;
     private Restaurant[] restaurants = null;
-    private String resultPub = null;
-    private String resultRestaurant = null;
 
     private EstablishmentAdapter adapter1;
     private EstablishmentAdapter adapter2;
@@ -65,10 +63,7 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
 
         unbinder = ButterKnife.bind(this, view);
         //Esto es para que recargue la busqueda cuando le doy al botón back
-        if(resultPub != null && resultPub.length() > 0 &&
-                resultRestaurant != null && resultRestaurant.length() > 0) {
-            pubs = gson.fromJson(resultPub, Pub[].class);
-            restaurants = gson.fromJson(resultRestaurant, Restaurant[].class);
+        if(pubs != null && restaurants != null) {
             configAdapter();
             configReclyclerView();
             generateEstablishment();
@@ -209,10 +204,6 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            // Guardo el resultado ya que me hará falta cuando pulse el botón back para no hacer
-            // de nuevo la búsqueda.
-            resultPub = result;
-
             pubs = gson.fromJson(result, Pub[].class);
 
             // Cerrar ventana de diálogo
@@ -282,10 +273,6 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
-
-            // Guardo el resultado ya que me hará falta cuando pulse el botón back para no hacer
-            // de nuevo la búsqueda.
-            resultRestaurant = result;
 
             restaurants = gson.fromJson(result, Restaurant[].class);
 

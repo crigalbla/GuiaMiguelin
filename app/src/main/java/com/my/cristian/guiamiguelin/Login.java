@@ -100,7 +100,7 @@ public class Login extends Fragment {
 
     @OnClick(R.id.textRegister)
     public void onViewClicked() {
-        getActivity().setTitle("Reguistrar usuario");
+        getActivity().setTitle("Registrar usuario");
         getActivity().getFragmentManager().beginTransaction()
                 .replace(R.id.contenedor, new Register()).addToBackStack(null).commit();
     }

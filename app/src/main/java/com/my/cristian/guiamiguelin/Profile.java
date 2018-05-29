@@ -62,6 +62,11 @@ public class Profile extends Fragment {
     private boolean follow = false;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -70,14 +75,18 @@ public class Profile extends Fragment {
         userIdLogged = Preferences.obtenerPreferenceString(getActivity(),
                 Preferences.PREFERENCE_USER_LOGIN);
 
+        unbinder = ButterKnife.bind(this, view);
         Object userId = getArguments() != null ? getArguments().get("userId") : null;
-        if(userId != null){
-            mongoAPI("/users/" + userId,"GET");
+        if(userProfile != null){ // Caso en el que estoy pulsando back
+            continueGet1();
         }else{
-            mongoAPI("/users/" + userIdLogged, "GET");
+            if (userId != null) {
+                mongoAPI("/users/" + userId, "GET");
+            } else {
+                mongoAPI("/users/" + userIdLogged, "GET");
+            }
         }
 
-        unbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -92,23 +101,34 @@ public class Profile extends Fragment {
     @OnClick(R.id.BTedit)
     public void goToEdit() {
         Object userId = getArguments() != null ? getArguments().get("userId") : null;
-        if(userId != null){
-            if(BTedit.getText().toString().equals("Seguir")){
+        if (userId != null) {
+            if (BTedit.getText().toString().equals("Seguir")) {
                 follow = true;
                 mongoAPI("/users/" + userIdLogged, "FOLLOW-UNFOLLOW");
-            }else if(BTedit.getText().toString().equals("Dejar de seguir")){
+            } else if (BTedit.getText().toString().equals("Dejar de seguir")) {
                 follow = false;
                 mongoAPI("/users/" + userIdLogged, "FOLLOW-UNFOLLOW");
-            }else if(userId.equals(userIdLogged)){
+            } else if (userId.equals(userIdLogged)) {
                 getActivity().setTitle("Editar perfil");
                 getActivity().getFragmentManager().beginTransaction()
                         .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
             }
-        }else{
+        } else {
             getActivity().setTitle("Editar perfil");
             getActivity().getFragmentManager().beginTransaction()
                     .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
         }
+    }
+
+    @OnClick(R.id.followeds)
+    public void onViewClicked() {
+        getActivity().setTitle("Usarios seguidos");
+        Fragment fragment = new Followeds();
+        Bundle args = new Bundle();
+        args.putString("userId", userProfile.getId());
+        fragment.setArguments(args);
+        getActivity().getFragmentManager().beginTransaction()
+                .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -161,35 +181,7 @@ public class Profile extends Fragment {
 
             try {
                 userProfile = gson.fromJson(result, User.class);
-
-                TVnick.setText(userProfile.getNick());
-                TVname.setText(userProfile.getName());
-                TVsurnames.setText(userProfile.getSurname());
-
-                Integer phone = (userProfile.getPhone() != null)? Integer.valueOf(userProfile.getPhone()) : null;
-                String city = userProfile.getCity();
-                String email = userProfile.getEmail();
-                String pleasures = userProfile.getPleasures();
-                String description = userProfile.getDescription();
-
-                if(phone != null)
-                    TVphone.setText(phone.toString());
-                if(city != null)
-                    TVcity.setText(city);
-                if(email != null)
-                    TVemail.setText(email);
-                if(pleasures != null)
-                    TVpleasures.setText(pleasures);
-                if(description != null)
-                    TVdescription.setText(description);
-
-                if(!userIdLogged.equals(userProfile.getId()))
-                    if(userIdLogged != null && userIdLogged.length() > 0){
-                        // Cojo el usuario que ha iniciado sesión
-                        mongoAPI("/users/" + userIdLogged,"GET2");
-                    }else {
-                        BTedit.setVisibility(View.INVISIBLE);
-                    }
+                continueGet1();
 
             } catch (Throwable throwable) {
                 Toast.makeText(getActivity(), "Ha habido un problema con la aplicación",
@@ -232,6 +224,41 @@ public class Profile extends Fragment {
 
             return result.toString();
         }
+    }
+
+    private void continueGet1(){
+        TVnick.setText(userProfile.getNick());
+        TVname.setText(userProfile.getName());
+        TVsurnames.setText(userProfile.getSurname());
+
+        Integer phone = (userProfile.getPhone() != null) ? Integer.valueOf(userProfile.getPhone()) : null;
+        String city = userProfile.getCity();
+        String email = userProfile.getEmail();
+        String pleasures = userProfile.getPleasures();
+        String description = userProfile.getDescription();
+
+        if (phone != null)
+            TVphone.setText(phone.toString());
+        if (city != null)
+            TVcity.setText(city);
+        if (email != null)
+            TVemail.setText(email);
+        if (pleasures != null)
+            TVpleasures.setText(pleasures);
+        if (description != null)
+            TVdescription.setText(description);
+
+        if (!userIdLogged.equals(userProfile.getId()))
+            if (userIdLogged != null && userIdLogged.length() > 0) {
+                // Cojo el usuario que ha iniciado sesión
+                if(userLogged != null){ // Caso en el que estoy pulsando back
+                    continueGet2();
+                }else{
+                    mongoAPI("/users/" + userIdLogged, "GET2");
+                }
+            } else {
+                BTedit.setVisibility(View.INVISIBLE);
+            }
     }
 
     // GET2 -----------------------------------------------------------------------------------------
@@ -266,13 +293,7 @@ public class Profile extends Fragment {
 
             try {
                 userLogged = gson.fromJson(result, User.class);
-
-                Object userId = getArguments() != null ? getArguments().get("userId") : null;
-                if(userLogged.getFolloweds().contains(userId)){
-                    BTedit.setText("Dejar de seguir");
-                }else{
-                    BTedit.setText("Seguir");
-                }
+                continueGet2();
 
             } catch (Throwable throwable) {
                 Toast.makeText(getActivity(), "Ha habido un problema con la aplicación",
@@ -317,6 +338,15 @@ public class Profile extends Fragment {
         }
     }
 
+    private void continueGet2(){
+        Object userId = getArguments() != null ? getArguments().get("userId") : null;
+        if (userLogged.getFolloweds().contains(userId)) {
+            BTedit.setText("Dejar de seguir");
+        } else {
+            BTedit.setText("Seguir");
+        }
+    }
+
     // PUT -----------------------------------------------------------------------------------------
 
     @SuppressLint("StaticFieldLeak")
@@ -348,11 +378,11 @@ public class Profile extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if(follow){
+            if (follow) {
                 BTedit.setText("Dejar de seguir");
                 Toast.makeText(getActivity(), "Has comenzado a seguir a " + userProfile.getNick(),
                         Toast.LENGTH_LONG).show();
-            }else{
+            } else {
                 BTedit.setText("Seguir");
                 Toast.makeText(getActivity(), "Has dejado de seguir a " + userProfile.getNick(),
                         Toast.LENGTH_LONG).show();
@@ -370,9 +400,9 @@ public class Profile extends Fragment {
             try {
                 // Creo los datos a actualizar
                 List<String> followeds = userLogged.getFolloweds();
-                if(follow){
+                if (follow) {
                     followeds.add(userProfile.getId());
-                }else{
+                } else {
                     followeds.remove(userProfile.getId());
                 }
                 userLogged.setFolloweds(followeds);

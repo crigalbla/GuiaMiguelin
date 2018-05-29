@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="Bares"
                 android:gravity="center"
-                android:background="@color/colorPrimary"
+                android:background="#ff9d00"
                 android:textColor="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:text="Restaurantes"
                 android:gravity="center"
-                android:background="@color/colorPrimary"
+                android:background="#ff9d00"
                 android:textColor="#ffffff"
                 android:textAppearance="?android:attr/textAppearanceLarge"/>
 

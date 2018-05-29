@@ -10,9 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -26,22 +24,22 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.Unbinder;
+import domain.FollowedsDomain;
 import domain.User;
 
-public class UserSearch extends Fragment implements OnItemClickListener2 {
 
-    @BindView(R.id.search)
-    EditText search;
-    @BindView(R.id.searchButoon)
-    Button searchButoon;
-    @BindView(R.id.recycleUsers)
-    RecyclerView recycleUsers;
+public class Followeds extends Fragment implements OnItemClickListener2 {
+
+    @BindView(R.id.recycleFolloweds)
+    RecyclerView recycleFolloweds;
+    @BindView(R.id.notFolloweds)
+    TextView notFolloweds;
     Unbinder unbinder;
 
     private static final Gson gson = new Gson();
     private User[] users = null;
+    private String result2 = null;
 
     private UserAdapter adapter;
 
@@ -49,14 +47,19 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.user_search, container, false);
+        View view = inflater.inflate(R.layout.followeds, container, false);
 
         unbinder = ButterKnife.bind(this, view);
         //Esto es para que recargue la busqueda cuando le doy al botón back
-        if(users != null) {
+        if (result2 != null && result2.length() > 0) {
+            FollowedsDomain followeds = gson.fromJson(result2, FollowedsDomain.class);
+            users = followeds.getFolloweds();
             configAdapter();
             configReclyclerView();
             generateUser();
+        } else {
+            Object userId = getArguments() != null ? getArguments().get("userId") : null;
+            mongoAPI("/users/followeds/" + userId, "GET");
         }
         return view;
     }
@@ -73,10 +76,10 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
     public void onItemClick(User user) {
         String a = "";
         String b = user.getId().toString();
-        for(int i=0; i<adapter.getItemCount(); i++){
+        for (int i = 0; i < adapter.getItemCount(); i++) {
             a = adapter.getId(i);
 
-            if(a.contains(b)){
+            if (a.contains(b)) {
                 getActivity().setTitle("Perfil de usuario");
                 Fragment fragment = new Profile();
                 Bundle args = new Bundle();
@@ -94,8 +97,8 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
     }
 
     private void configReclyclerView() {
-        recycleUsers.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recycleUsers.setAdapter(adapter);
+        recycleFolloweds.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recycleFolloweds.setAdapter(adapter);
     }
 
     private void generateUser() {
@@ -103,21 +106,8 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         for (User u : users) {
             adapter.add(u);
         }
-    }
-
-    // Botones -------------------------------------------------------------------------------------
-
-    @OnClick(R.id.searchButoon)
-    public void searchOnClick() {
-        String searchString = search.getText().toString().replaceAll("^\\s*", "");
-        searchString = searchString.replaceAll("\\s*$", "");
-
-        if (searchString != "") {
-            mongoAPI("/users/search?search=" + searchString, "GET");
-        } else {
-            Toast.makeText(getActivity(), "Introduzca una búsqueda válida",
-                    Toast.LENGTH_SHORT).show();
-        }
+        if(users.length == 0)
+            notFolloweds.setVisibility(View.VISIBLE);
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -127,7 +117,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         // Local http://192.168.1.106:1234/
         switch (type) {
             case ("GET"):
-                new UserSearch.GetDataTask().execute(URL_BASE + url);
+                new GetDataTask().execute(URL_BASE + url);
                 break;
         }
     }
@@ -144,7 +134,7 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
             super.onPreExecute();
 
             progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Buscado usuarios...");
+            progressDialog.setMessage("Buscado usuarios seguidos...");
             progressDialog.show();
         }
 
@@ -162,7 +152,12 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            users = gson.fromJson(result, User[].class);
+            // Guardo el resultado ya que me hará falta cuando pulse el botón back para no hacer
+            // de nuevo la búsqueda.
+            result2 = result;
+
+            FollowedsDomain followeds = gson.fromJson(result, FollowedsDomain.class);
+            users = followeds.getFolloweds();
 
             configAdapter();
             configReclyclerView();

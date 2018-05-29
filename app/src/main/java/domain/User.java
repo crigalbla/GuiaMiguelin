@@ -10,7 +10,7 @@ public class User {
 
     private String _id;
     private String nick;
-    private String passaword;
+    private String password;
     private String name;
     private String surname;
     private String description;
@@ -21,12 +21,12 @@ public class User {
     private List<String> followeds;
     private List<String> reviews;
 
-    public User(String _id, String nick, String passaword, String name, String surname,
+    public User(String _id, String nick, String password, String name, String surname,
                 String description, String pleasures, String city, String email, Integer phone,
                 List<String> followeds, List<String> reviews) {
         this._id = _id;
         this.nick = nick;
-        this.passaword = passaword;
+        this.password = password;
         this.name = name;
         this.surname = surname;
         this.description = description;
@@ -38,11 +38,11 @@ public class User {
         this.reviews = reviews;
     }
 
-    public User(String _id, String nick, String passaword, String name, String surname,
+    public User(String _id, String nick, String password, String name, String surname,
                 String description, String pleasures, String city, String email, Integer phone) {
         this._id = _id;
         this.nick = nick;
-        this.passaword = passaword;
+        this.password = password;
         this.name = name;
         this.surname = surname;
         this.description = description;
@@ -72,12 +72,12 @@ public class User {
         this.nick = nick;
     }
 
-    public String getPassaword() {
-        return passaword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPassaword(String passaword) {
-        this.passaword = passaword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getName() {

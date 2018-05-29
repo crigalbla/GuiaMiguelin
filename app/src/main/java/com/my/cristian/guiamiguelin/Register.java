@@ -277,7 +277,7 @@ public class Register extends Fragment {
             try {
                 // Creo datos para enviarlos al servidor
                 newUser.setNick(nick.getText().toString());
-                newUser.setPassaword(password.getText().toString());
+                newUser.setPassword(password.getText().toString());
                 newUser.setName(name.getText().toString());
                 newUser.setSurname(surnames.getText().toString());
                 if(description.getText().toString().trim().length() > 0)

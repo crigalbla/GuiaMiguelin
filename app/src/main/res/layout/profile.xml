@@ -110,14 +110,29 @@
             android:layout_margin="@dimen/pading_small"
             android:background="@drawable/border"/>
 
-        <Button
-            android:id="@+id/BTedit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_margin="@dimen/pading_medium"
-            android:text="Editar perfil"
-            android:theme="@style/buttons" />
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/BTedit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Editar perfil"
+                android:theme="@style/buttons" />
+
+            <Button
+                android:id="@+id/followeds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Seguidos"
+                android:theme="@style/buttons" />
+        </LinearLayout>
+
 
     </LinearLayout>
 

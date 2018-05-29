@@ -70,23 +70,29 @@ public class ShowEstablishment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.show_establishment, container, false);
+        unbinder = ButterKnife.bind(this, view);
 
         String pubId = getArguments() != null ?
                 (String) getArguments().get("pubId") : null;
         String restaurantId = getArguments() != null ?
                 (String) getArguments().get("restaurantId") : null;
 
-        if (pubId != null) {
-            mongoAPI("/pubs/" + pubId, "GET");
-        } else if (restaurantId != null) {
-            mongoAPI("/restaurants/" + restaurantId, "GET");
-        } else {
-            Toast.makeText(getActivity(),
-                    "No se ha obtenido ID de establecimiento para mostrar",
-                    Toast.LENGTH_LONG).show();
+        if(pub != null && pub.getTypePub() != null){ // Casos en el que estoy pulsando back
+            continuePub();
+        }else if(restaurant != null && restaurant.getTypeRestaurant() != null){
+            continueRestaurant();
+        }else{ // Caso normal en el que entro por primera vez a la vista
+            if (pubId != null) {
+                mongoAPI("/pubs/" + pubId, "GET");
+            } else if (restaurantId != null) {
+                mongoAPI("/restaurants/" + restaurantId, "GET");
+            } else {
+                Toast.makeText(getActivity(),
+                        "No se ha obtenido ID de establecimiento para mostrar",
+                        Toast.LENGTH_LONG).show();
+            }
         }
 
-        unbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -205,58 +211,12 @@ public class ShowEstablishment extends Fragment {
 
             try { // Intenta parsear a obejto Pub
                 pub = gson.fromJson(result, Pub.class);
-                establishmentName.setText(pub.getName());
-                establishmentAddresss.setText(pub.getAddress());
-                establishmentDescription.setText(pub.getDescription());
-                establishmentHorary.setText("De " + pub.getOpening() + " a " + pub.getClosing());
-                String type = pub.getTypePub().toString();
-                type = type.replaceAll("_", " ");
-                establishmentType.setText(type);
-                if (pub.getReviews().size() > 0) {
-                    establishmentPuntuation.setText(String.valueOf(pub.getAverage()));
-                } else {
-                    establishmentPuntuation.setText("N/A");
-                }
-
-                Integer phone = (pub.getPhone() != null) ? new Integer(pub.getPhone()) : null;
-
-                if (phone != null)
-                    establishmentPhone.setText(phone.toString());
-
-                if (pub.getReviews().size() > 0) {
-                    noReviews.setVisibility(View.INVISIBLE);
-                    mongoAPI("/reviews/byEstablishment/" + pub.getId(), "Reviews");
-                }
+                continuePub();
 
             } catch (Throwable throwable) { // Si la respuesta no es un objeto Pub
                 try { // Intenta parsear a objeto Restaurant
                     restaurant = gson.fromJson(result, Restaurant.class);
-
-                    establishmentName.setText(restaurant.getName());
-                    establishmentAddresss.setText(restaurant.getAddress());
-                    establishmentDescription.setText(restaurant.getDescription());
-                    establishmentHorary.setText("De " + restaurant.getOpening() + " a "
-                            + restaurant.getClosing());
-                    String type = restaurant.getTypeRestaurant().toString();
-                    type = type.replaceAll("_", " ");
-                    establishmentType.setText(type);
-                    if (restaurant.getReviews().size() > 0) {
-                        establishmentPuntuation.setText(String.valueOf(restaurant.getAverage()));
-                    } else {
-                        establishmentPuntuation.setText("N/A");
-                    }
-
-                    Integer phone = (restaurant.getPhone() != null) ?
-                            new Integer(restaurant.getPhone()) : null;
-
-                    if (phone != null)
-                        establishmentPhone.setText(phone.toString());
-
-                    if (restaurant.getReviews().size() > 0) {
-                        noReviews.setVisibility(View.INVISIBLE);
-                        mongoAPI("/reviews/byEstablishment/" + restaurant.getId(),
-                                "Reviews");
-                    }
+                    continueRestaurant();
 
                 } catch (Throwable throwable1) { // En caso de que haya habido error, notifícamelo
                     Toast.makeText(getActivity(),
@@ -300,6 +260,70 @@ public class ShowEstablishment extends Fragment {
             }
 
             return result.toString();
+        }
+    }
+
+    private void continuePub(){
+        String type = pub.getTypePub().toString();
+        type = type.replaceAll("_", " ");
+        establishmentName.setText(pub.getName());
+        establishmentAddresss.setText(pub.getAddress());
+        establishmentDescription.setText(pub.getDescription());
+        establishmentHorary.setText("De " + pub.getOpening() + " a " + pub.getClosing());
+        establishmentType.setText(type);
+        if (pub.getReviews().size() > 0) {
+            establishmentPuntuation.setText(String.valueOf(pub.getAverage()));
+        } else {
+            establishmentPuntuation.setText("N/A");
+        }
+
+        Integer phone = (pub.getPhone() != null) ? new Integer(pub.getPhone()) : null;
+
+        if (phone != null)
+            establishmentPhone.setText(phone.toString());
+
+        if (pub.getReviews().size() > 0) {
+            noReviews.setVisibility(View.INVISIBLE);
+            if(reviews != null){ // Casos en el que estoy pulsando back
+                configAdapter();
+                configReclyclerView();
+                generateReviews();
+            }else {
+                mongoAPI("/reviews/byEstablishment/" + pub.getId(), "Reviews");
+            }
+        }
+    }
+
+    private void continueRestaurant(){
+        String type = restaurant.getTypeRestaurant().toString();
+        type = type.replaceAll("_", " ");
+        establishmentName.setText(restaurant.getName());
+        establishmentAddresss.setText(restaurant.getAddress());
+        establishmentDescription.setText(restaurant.getDescription());
+        establishmentHorary.setText("De " + restaurant.getOpening() + " a "
+                + restaurant.getClosing());
+        establishmentType.setText(type);
+        if (restaurant.getReviews().size() > 0) {
+            establishmentPuntuation.setText(String.valueOf(restaurant.getAverage()));
+        } else {
+            establishmentPuntuation.setText("N/A");
+        }
+
+        Integer phone = (restaurant.getPhone() != null) ?
+                new Integer(restaurant.getPhone()) : null;
+
+        if (phone != null)
+            establishmentPhone.setText(phone.toString());
+
+        if (restaurant.getReviews().size() > 0) {
+            noReviews.setVisibility(View.INVISIBLE);
+            if(reviews != null){ // Casos en el que estoy pulsando back
+                configAdapter();
+                configReclyclerView();
+                generateReviews();
+            }else{
+                mongoAPI("/reviews/byEstablishment/" + restaurant.getId(),"Reviews");
+            }
         }
     }
 

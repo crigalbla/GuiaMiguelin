@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:text="Usuarios"
             android:gravity="center"
-            android:background="@color/colorPrimary"
+            android:background="#ff9d00"
             android:textColor="#ffffff"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 
