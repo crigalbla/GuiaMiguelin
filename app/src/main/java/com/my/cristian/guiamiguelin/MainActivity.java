@@ -39,10 +39,37 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // Para iniciar la vista principal contentMain
-        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(R.id.contenedor, new ContentMain());
-        transaction.commit();
+        String pubCoordinates = getIntent().getStringExtra("pubCoordinates");
+        String restaurantCoordinates = getIntent().getStringExtra("restaurantCoordinates");
+
+        // Los dos primeros casos vendo desde el mapa
+        if(pubCoordinates != null){
+            String coordinates = pubCoordinates
+                    .replace("lat/lng: (", "").replace(")", "");
+            setTitle("Bar");
+            Fragment fragment = new ShowEstablishment();
+            Bundle args = new Bundle();
+            args.putString("pubCoordinates", coordinates);
+            fragment.setArguments(args);
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.contenedor, fragment);
+            transaction.commit();
+        }else if(restaurantCoordinates != null){
+            String coordinates = restaurantCoordinates
+                    .replace("lat/lng: (", "").replace(")", "");
+            setTitle("Restaurante");
+            Fragment fragment = new ShowEstablishment();
+            Bundle args = new Bundle();
+            args.putString("restaurantCoordinates", coordinates);
+            fragment.setArguments(args);
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.contenedor, fragment);
+            transaction.commit();
+        }else { // Para iniciar la vista principal contentMain
+            android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+            transaction.replace(R.id.contenedor, new ContentMain());
+            transaction.commit();
+        }
     }
 
     // Esto es para cuando se pulse en navigation drawer (para desplegarlo)

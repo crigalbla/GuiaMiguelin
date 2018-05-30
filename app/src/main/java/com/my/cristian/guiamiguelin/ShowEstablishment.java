@@ -89,7 +89,22 @@ public class ShowEstablishment extends Fragment {
         } else if (restaurant != null && restaurant.getTypeRestaurant() != null) {
             continueRestaurant();
         } else { // Caso normal en el que entro por primera vez a la vista
-            firstOrRecharge();
+            String pubCoordinates = getArguments() != null ?
+                    (String) getArguments().get("pubCoordinates") : null;
+            String restaurantCoordinates = getArguments() != null ?
+                    (String) getArguments().get("restaurantCoordinates") : null;
+
+            if(pubCoordinates != null){ // Vengo del mapa
+                String[] pubCoordinatesSplit = pubCoordinates.split(",");
+                mongoAPI("/pubs/coordinates?lat=" + pubCoordinatesSplit[0]
+                        + "&lng=" + pubCoordinatesSplit[1], "GET");
+            }else if(restaurantCoordinates != null){ // Vengo del mapa
+                String[] restaurantCoordinatesSplit = restaurantCoordinates.split(",");
+                mongoAPI("/restaurants/coordinates?lat=" + restaurantCoordinatesSplit[0]
+                        + "&lng=" + restaurantCoordinatesSplit[1], "GET");
+            }else { // Cargo la vista por primera vez haciendo un uso normal de navegación
+                firstOrRecharge();
+            }
         }
 
         return view;
