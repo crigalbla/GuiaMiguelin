@@ -187,8 +187,10 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
         @Override
         public void onProviderDisabled(String s) {
             mensaje = ("GPS Desactivado");
-            locationStart();
-            Mensaje();
+            if(getActivity() != null) { // Esto evita que pete cuando quitamos el GPS en otra vista
+                locationStart();
+                Mensaje();
+            }
         }
     };
 
