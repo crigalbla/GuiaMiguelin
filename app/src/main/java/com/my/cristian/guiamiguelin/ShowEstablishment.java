@@ -3,6 +3,7 @@ package com.my.cristian.guiamiguelin;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -94,15 +95,15 @@ public class ShowEstablishment extends Fragment {
             String restaurantCoordinates = getArguments() != null ?
                     (String) getArguments().get("restaurantCoordinates") : null;
 
-            if(pubCoordinates != null){ // Vengo del mapa
+            if (pubCoordinates != null) { // Vengo del mapa
                 String[] pubCoordinatesSplit = pubCoordinates.split(",");
                 mongoAPI("/pubs/coordinates?lat=" + pubCoordinatesSplit[0]
                         + "&lng=" + pubCoordinatesSplit[1], "GET");
-            }else if(restaurantCoordinates != null){ // Vengo del mapa
+            } else if (restaurantCoordinates != null) { // Vengo del mapa
                 String[] restaurantCoordinatesSplit = restaurantCoordinates.split(",");
                 mongoAPI("/restaurants/coordinates?lat=" + restaurantCoordinatesSplit[0]
                         + "&lng=" + restaurantCoordinatesSplit[1], "GET");
-            }else { // Cargo la vista por primera vez haciendo un uso normal de navegación
+            } else { // Cargo la vista por primera vez haciendo un uso normal de navegación
                 firstOrRecharge();
             }
         }
@@ -133,18 +134,18 @@ public class ShowEstablishment extends Fragment {
         }
     }
 
-    private void refreshContent(){
+    private void refreshContent() {
         new Handler().postDelayed(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 reviews = null;
                 firstOrRecharge();
                 swipeContainer.setRefreshing(false);
             }
         }, 1000);
-
     }
 
-    private void firstOrRecharge(){
+    private void firstOrRecharge() {
         String pubId = getArguments() != null ?
                 (String) getArguments().get("pubId") : null;
         String restaurantId = getArguments() != null ?
@@ -167,8 +168,22 @@ public class ShowEstablishment extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.weStateHere:
-                // TODO
-                Toast.makeText(getActivity(), "Por hacer", Toast.LENGTH_SHORT).show();
+                Intent i = null;
+                if (pub != null) {
+                    i = new Intent(getActivity(), GoogleMaps.class);
+                    i.putExtra("coordinates", pub.getLatitude().toString() + ","
+                            + pub.getLongitude().toString());
+                }else if (restaurant != null) {
+                    i = new Intent(getActivity(), GoogleMaps.class);
+                    i.putExtra("coordinates", restaurant.getLatitude().toString() + ","
+                            + restaurant.getLongitude().toString());
+                }else{
+                    Toast.makeText(getActivity(), "Error al obtener las coordenadas del " +
+                            "establecimiento", Toast.LENGTH_SHORT).show();
+                }
+                if(i != null)
+                    startActivity(i);
+
                 break;
             case R.id.newReview:
                 if (Preferences.obtenerPreferenceString(getActivity(),
@@ -201,6 +216,22 @@ public class ShowEstablishment extends Fragment {
                 }
                 break;
         }
+    }
+
+    @OnClick(R.id.showCarte)
+    public void showCarte() {
+        getActivity().setTitle("Carta");
+        Fragment fragment = new ShowCarte();
+        Bundle args = new Bundle();
+        if (pub != null) {
+            args.putString("carteId", pub.getCarte());
+        }
+        if (restaurant != null) {
+            args.putString("carteId", restaurant.getCarte());
+        }
+        fragment.setArguments(args);
+        getActivity().getFragmentManager().beginTransaction()
+                .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
     }
 
     // Peticiones a la API -------------------------------------------------------------------------

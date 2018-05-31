@@ -56,6 +56,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
     Integer numberEstablishments = 0;
     Double cameraLat = 0.0;
     Double cameraLng = 0.0;
+    boolean one = true;
 
     private static final Gson gson = new Gson();
 
@@ -91,7 +92,6 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public void onInfoWindowClick(Marker marker) {
                 Intent i = new Intent(GoogleMaps.this, MainActivity.class);
-                String a = marker.getPosition().toString();
                 if(marker.getSnippet().toString().contains("Restaurante")){
                     i.putExtra("restaurantCoordinates", marker.getPosition().toString());
                 }else if(marker.getSnippet().toString().contains("Bar")){
@@ -159,7 +159,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
                 .position(coordinates)
                 .title("Mi posición (Calle: " + street + ")")
                 .icon(BitmapDescriptorFactory.defaultMarker()));
-        mMap.animateCamera(myLocation); // con esto situo la cámara de nuevo en donde estoy
+//        mMap.animateCamera(myLocation); // con esto situo la cámara de nuevo en donde estoy
     }
 
     private void uppdateUbication(Location location){
@@ -261,6 +261,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
             try {
                 pubs = gson.fromJson(result, Pub[].class);
 
+                String coordinatesByShowEstablishment = getIntent()
+                        .getStringExtra("coordinates");
                 // Añado todos lo bares al mapa
                 for(Pub p: pubs){
                     String average = "N/A";
@@ -268,12 +270,21 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
                         average = p.getAverage().toString();
 
                     LatLng latLng = new LatLng(p.getLatitude(), p.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng)
-                            .title(p.getName()))
-                            .setSnippet("Tipo de Bar: " + p.getTypePub()
+                    Marker ma = mMap.addMarker(new MarkerOptions().position(latLng)
+                            .title(p.getName()));
+                    ma.setSnippet("Tipo de Bar: " + p.getTypePub()
                             + ", Puntuación: " + average);
                     cameraLat = cameraLat + p.getLatitude();
                     cameraLng = cameraLng + p.getLongitude();
+
+                    // Compruebo si vengo de la vista showEstablishment para desplegar el marker
+                    // del establecimiento
+                    if(one && coordinatesByShowEstablishment != null &&
+                            coordinatesByShowEstablishment.equals(p.getLatitude()
+                                    + "," + p.getLongitude())){
+                        ma.showInfoWindow();
+                        one = false;
+                    }
                 }
                 numberEstablishments = pubs.length;
 
@@ -354,6 +365,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
             try {
                 restaurants = gson.fromJson(result, Restaurant[].class);
 
+                String coordinatesByShowEstablishment = getIntent()
+                        .getStringExtra("coordinates");
                 // Añado todos los restaurantes al mapa
                 for(Restaurant r: restaurants){
                     String average = "N/A";
@@ -361,19 +374,35 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
                         average = r.getAverage().toString();
 
                     LatLng latLng = new LatLng(r.getLatitude(), r.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng)
-                            .title(r.getName()))
-                            .setSnippet("Tipo de Restaurante: " + r.getTypeRestaurant()
+                    Marker ma = mMap.addMarker(new MarkerOptions().position(latLng)
+                            .title(r.getName()));
+                    ma.setSnippet("Tipo de Restaurante: " + r.getTypeRestaurant()
                             + ", Puntuación: " + average);
                     cameraLat = cameraLat + r.getLatitude();
                     cameraLng = cameraLng + r.getLongitude();
+
+                    // Compruebo si vengo de la vista showEstablishment para desplegar el marker
+                    // del establecimiento
+                    if(one && coordinatesByShowEstablishment != null &&
+                            coordinatesByShowEstablishment.equals(r.getLatitude()
+                                    + "," + r.getLongitude())){
+                        ma.showInfoWindow();
+                        one = false;
+                    }
                 }
                 numberEstablishments = numberEstablishments + restaurants.length;
 
-                // Coloco la cámara en el centro de todos los establecimientos
-                LatLng camera = new LatLng(cameraLat/numberEstablishments,
-                        cameraLng/numberEstablishments);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(camera, 16));
+                // Caso en el que vengo desde la vista showEstablishment
+                if(coordinatesByShowEstablishment != null){
+                    String[] coord = coordinatesByShowEstablishment.split(",");
+                    LatLng camera = new LatLng(new Double(coord[0]), new Double(coord[1]));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(camera, 20));
+                }else { // Caso normal cargando la vista GoogleMaps
+                    // Coloco la cámara en el centro de todos los establecimientos
+                    LatLng camera = new LatLng(cameraLat/numberEstablishments,
+                            cameraLng/numberEstablishments);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(camera, 16));
+                }
 
             } catch (Throwable throwable) {// En caso de que haya habido error, notifícamelo
                 Toast.makeText(GoogleMaps.this,

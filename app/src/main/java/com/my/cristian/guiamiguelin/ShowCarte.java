@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -25,39 +24,29 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import domain.FollowedsDomain;
-import domain.User;
+import domain.Product;
 
+public class ShowCarte extends Fragment {
 
-public class Followeds extends Fragment implements OnItemClickListener2 {
-
-    @BindView(R.id.recycleFolloweds)
-    RecyclerView recycleFolloweds;
-    @BindView(R.id.notFolloweds)
-    TextView notFolloweds;
+    @BindView(R.id.recycleProducts)
+    RecyclerView recycleProducts;
     Unbinder unbinder;
 
     private static final Gson gson = new Gson();
-    private User[] users = null;
+    private Product[] products = null;
 
-    private UserAdapter adapter;
+    private ProductAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.followeds, container, false);
+        View view = inflater.inflate(R.layout.show_carte, container, false);
 
         unbinder = ButterKnife.bind(this, view);
-        //Esto es para que recargue la busqueda cuando le doy al botón back
-        if (users != null) {
-            configAdapter();
-            configReclyclerView();
-            generateUser();
-        } else {
-            Object userId = getArguments() != null ? getArguments().get("userId") : null;
-            mongoAPI("/users/followeds/" + userId, "GET");
-        }
+        Object carteId = getArguments() != null ? getArguments().get("carteId") : null;
+        mongoAPI("/products/byCarte/" + carteId, "GET");
+
         return view;
     }
 
@@ -69,42 +58,20 @@ public class Followeds extends Fragment implements OnItemClickListener2 {
 
     // Métodos auxiliares --------------------------------------------------------------------------
 
-    @Override
-    public void onItemClick(User user) {
-        String a = "";
-        String b = user.getId().toString();
-        for (int i = 0; i < adapter.getItemCount(); i++) {
-            a = adapter.getId(i);
-
-            if (a.contains(b)) {
-                getActivity().setTitle("Perfil de usuario");
-                Fragment fragment = new Profile();
-                Bundle args = new Bundle();
-                args.putString("userId", a);
-                fragment.setArguments(args);
-                getActivity().getFragmentManager().beginTransaction()
-                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
-                break;
-            }
-        }
-    }
-
     private void configAdapter() {
-        adapter = new UserAdapter(new ArrayList<User>(), this);
+        adapter = new ProductAdapter(new ArrayList<Product>());
     }
 
     private void configReclyclerView() {
-        recycleFolloweds.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recycleFolloweds.setAdapter(adapter);
+        recycleProducts.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recycleProducts.setAdapter(adapter);
     }
 
     private void generateUser() {
 
-        for (User u : users) {
-            adapter.add(u);
+        for (Product p : products) {
+            adapter.add(p);
         }
-        if(users.length == 0)
-            notFolloweds.setVisibility(View.VISIBLE);
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -114,7 +81,7 @@ public class Followeds extends Fragment implements OnItemClickListener2 {
         // Local http://192.168.1.106:1234/
         switch (type) {
             case ("GET"):
-                new GetDataTask().execute(URL_BASE + url);
+                new ShowCarte.GetDataTask().execute(URL_BASE + url);
                 break;
         }
     }
@@ -131,7 +98,7 @@ public class Followeds extends Fragment implements OnItemClickListener2 {
             super.onPreExecute();
 
             progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Buscado usuarios seguidos...");
+            progressDialog.setMessage("Buscado productos...");
             progressDialog.show();
         }
 
@@ -149,8 +116,7 @@ public class Followeds extends Fragment implements OnItemClickListener2 {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            FollowedsDomain followeds = gson.fromJson(result, FollowedsDomain.class);
-            users = followeds.getFolloweds();
+            products = gson.fromJson(result, Product[].class);
 
             configAdapter();
             configReclyclerView();

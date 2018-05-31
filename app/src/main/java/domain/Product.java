@@ -7,12 +7,12 @@ package domain;
 public class Product {
 
     private String name;
-    private double price;
+    private Double price;
     private String typeFood;
     private String typeDrink;
     private String carte;
 
-    public Product(String name, double price, String typeFood, String typeDrink, String carte) {
+    public Product(String name, Double price, String typeFood, String typeDrink, String carte) {
         this.name = name;
         this.price = price;
         this.typeFood = typeFood;
@@ -20,7 +20,7 @@ public class Product {
         this.carte = carte;
     }
 
-    public Product(String name, double price, String typeFood, String typeDrink) {
+    public Product(String name, Double price, String typeFood, String typeDrink) {
         this.name = name;
         this.price = price;
         this.typeFood = typeFood;
@@ -39,11 +39,11 @@ public class Product {
         this.name = name;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 

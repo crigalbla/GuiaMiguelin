@@ -157,6 +157,15 @@
             </LinearLayout>
         </LinearLayout>
 
+        <Button
+            android:id="@+id/showCarte"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Ver carta"
+            android:layout_marginVertical="12dp"
+            android:theme="@style/buttons" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
