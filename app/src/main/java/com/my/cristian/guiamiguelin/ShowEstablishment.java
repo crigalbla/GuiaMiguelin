@@ -3,7 +3,6 @@ package com.my.cristian.guiamiguelin;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -166,23 +165,26 @@ public class ShowEstablishment extends Fragment {
 
     @OnClick({R.id.weStateHere, R.id.newReview})
     public void onViewClicked(View view) {
+        Fragment fragment = null;
+        Bundle args = new Bundle();
+
         switch (view.getId()) {
             case R.id.weStateHere:
-                Intent i = null;
+                getActivity().setTitle("Google Maps");
+                fragment = new GoogleMaps();
                 if (pub != null) {
-                    i = new Intent(getActivity(), GoogleMaps.class);
-                    i.putExtra("coordinates", pub.getLatitude().toString() + ","
+                    args.putString("coordinates",pub.getLatitude().toString() + ","
                             + pub.getLongitude().toString());
                 }else if (restaurant != null) {
-                    i = new Intent(getActivity(), GoogleMaps.class);
-                    i.putExtra("coordinates", restaurant.getLatitude().toString() + ","
+                    args.putString("coordinates",restaurant.getLatitude().toString() + ","
                             + restaurant.getLongitude().toString());
                 }else{
                     Toast.makeText(getActivity(), "Error al obtener las coordenadas del " +
                             "establecimiento", Toast.LENGTH_SHORT).show();
                 }
-                if(i != null)
-                    startActivity(i);
+                fragment.setArguments(args);
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
 
                 break;
             case R.id.newReview:
@@ -190,8 +192,7 @@ public class ShowEstablishment extends Fragment {
                         Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
 
                     getActivity().setTitle("Crear reseña");
-                    Fragment fragment = new CreateReview();
-                    Bundle args = new Bundle();
+                    fragment = new CreateReview();
                     if (pub != null) {
                         args.putString("nombre_establecimiento", pub.getName());
                         args.putString("id_establecimiento", pub.getId());

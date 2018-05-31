@@ -3,13 +3,12 @@ package com.my.cristian.guiamiguelin;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,15 +16,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,22 +37,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.Locale;
 
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import domain.Pub;
 import domain.Restaurant;
 
-public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
+public class GoogleMaps extends Fragment implements OnMapReadyCallback {
 
+    Unbinder unbinder;
+
+    View view = null;
     private static int PETICION_PERMISO_LOCALIZACION = 101;
     private GoogleMap mMap;
     private Marker marker;
     double lat = 0.0;
     double lng = 0.0;
     String mensaje;
-    String street = "";
-    Boolean evitarErrorMensaje = true;
     Integer numberEstablishments = 0;
     Double cameraLat = 0.0;
     Double cameraLng = 0.0;
@@ -64,22 +65,29 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
     private Restaurant[] restaurants = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
 
-        mongoAPI("/pubs/", "PUBS");
-        mongoAPI("/restaurants/", "RESTAURANTS");
+        if(view == null){
+            view = inflater.inflate(R.layout.maps, container, false);
+            unbinder = ButterKnife.bind(this, view);
+
+            // Obtain the MapFragment and get notified when the map is ready to be used.
+            MapFragment mapFragment = (MapFragment) this.getChildFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+
+            mongoAPI("/pubs/", "PUBS");
+            mongoAPI("/restaurants/", "RESTAURANTS");
+        }
+
+        return view;
     }
 
     @Override
-    public void onBackPressed() {
-        evitarErrorMensaje = false;
-        finish();
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     // Métodos de los mapas-------------------------------------------------------------------------
@@ -91,13 +99,21 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                Intent i = new Intent(GoogleMaps.this, MainActivity.class);
+                String coordinates = marker.getPosition().toString()
+                        .replace("lat/lng: (", "")
+                        .replace(")", "");
+                Fragment fragment = new ShowEstablishment();
+                Bundle args = new Bundle();
                 if(marker.getSnippet().toString().contains("Restaurante")){
-                    i.putExtra("restaurantCoordinates", marker.getPosition().toString());
+                    getActivity().setTitle("Restaurante");
+                    args.putString("restaurantCoordinates", coordinates);
                 }else if(marker.getSnippet().toString().contains("Bar")){
-                    i.putExtra("pubCoordinates", marker.getPosition().toString());
+                    getActivity().setTitle("Bar");
+                    args.putString("pubCoordinates", coordinates);
                 }
-                startActivity(i);
+                fragment.setArguments(args);
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
             }
         });
 
@@ -106,7 +122,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
 
     // Activar los servicios del gps cuando esten apagados
     public void locationStart() {
-        LocationManager mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        LocationManager mlocManager = (LocationManager) getActivity()
+                .getSystemService(Context.LOCATION_SERVICE);
         final boolean gpsEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean a = this.equals(new GoogleMaps());
         if (!gpsEnabled) {
@@ -116,7 +133,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
 
     // Petición de activar GPS
     private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("El GPS está desactivado, ¿quieres activalor?")
                 .setCancelable(false)
                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
@@ -133,32 +150,12 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
         alert.show();
     }
 
-    // Obtener la direccion de la calle a partir de la latitud y la longitud
-    public void setLocation(Location loc) {
-        if (loc.getLatitude() != 0.0 && loc.getLongitude() != 0.0) {
-            try {
-                Geocoder geocoder = new Geocoder(this, Locale.getDefault());
-                List<Address> list = geocoder.getFromLocation(
-                        loc.getLatitude(), loc.getLongitude(), 1);
-                if (!list.isEmpty()) {
-                    Address DirCalle = list.get(0);
-                    street = (DirCalle.getAddressLine(0));
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     private void agregateMarker(double lat, double lng) {
         LatLng coordinates = new LatLng(lat, lng);
         CameraUpdate myLocation = CameraUpdateFactory.newLatLngZoom(coordinates, 16);
         if (marker != null) marker.remove();
         marker = mMap.addMarker(new MarkerOptions()
-                .position(coordinates)
-                .title("Mi posición (Calle: " + street + ")")
-                .icon(BitmapDescriptorFactory.defaultMarker()));
+                .position(coordinates));
 //        mMap.animateCamera(myLocation); // con esto situo la cámara de nuevo en donde estoy
     }
 
@@ -174,7 +171,6 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
         @Override
         public void onLocationChanged(Location location) {
             uppdateUbication(location);
-            setLocation(location);
         }
 
         @Override
@@ -191,18 +187,18 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
         @Override
         public void onProviderDisabled(String s) {
             mensaje = ("GPS Desactivado");
-            if(evitarErrorMensaje)
-                locationStart();
+            locationStart();
             Mensaje();
         }
     };
 
     private void myLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PETICION_PERMISO_LOCALIZACION);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, PETICION_PERMISO_LOCALIZACION);
             return;
         } else {
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            LocationManager locationManager = (LocationManager) getActivity()
+                    .getSystemService(Context.LOCATION_SERVICE);
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             uppdateUbication(location);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,0,locListener);
@@ -210,7 +206,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
     }
 
     public void Mensaje() {
-        Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), mensaje, Toast.LENGTH_SHORT).show();
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -239,7 +235,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(GoogleMaps.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Obteniendo bares...");
             progressDialog.show();
         }
@@ -261,8 +257,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
             try {
                 pubs = gson.fromJson(result, Pub[].class);
 
-                String coordinatesByShowEstablishment = getIntent()
-                        .getStringExtra("coordinates");
+                String coordinatesByShowEstablishment = getArguments() != null ?
+                        (String) getArguments().get("coordinates") : null;
                 // Añado todos lo bares al mapa
                 for(Pub p: pubs){
                     String average = "N/A";
@@ -289,7 +285,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
                 numberEstablishments = pubs.length;
 
             } catch (Throwable throwable) {// En caso de que haya habido error, notifícamelo
-                Toast.makeText(GoogleMaps.this,
+                Toast.makeText(getActivity(),
                         "Ha habido un problema al obtener los bares",
                         Toast.LENGTH_LONG).show();
             }
@@ -343,7 +339,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            progressDialog = new ProgressDialog(GoogleMaps.this);
+            progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Obteniendo restaurantes...");
             progressDialog.show();
         }
@@ -365,8 +361,8 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
             try {
                 restaurants = gson.fromJson(result, Restaurant[].class);
 
-                String coordinatesByShowEstablishment = getIntent()
-                        .getStringExtra("coordinates");
+                String coordinatesByShowEstablishment = getArguments() != null ?
+                        (String) getArguments().get("coordinates") : null;
                 // Añado todos los restaurantes al mapa
                 for(Restaurant r: restaurants){
                     String average = "N/A";
@@ -405,7 +401,7 @@ public class GoogleMaps extends FragmentActivity implements OnMapReadyCallback {
                 }
 
             } catch (Throwable throwable) {// En caso de que haya habido error, notifícamelo
-                Toast.makeText(GoogleMaps.this,
+                Toast.makeText(getActivity(),
                         "Ha habido un problema al obtener los restaurantes",
                         Toast.LENGTH_LONG).show();
             }

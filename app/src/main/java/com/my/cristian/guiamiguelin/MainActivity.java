@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity
         String pubCoordinates = getIntent().getStringExtra("pubCoordinates");
         String restaurantCoordinates = getIntent().getStringExtra("restaurantCoordinates");
 
-        // Los dos primeros casos vendo desde el mapa
+        // Los dos primeros casos vengo desde el mapa
         if(pubCoordinates != null){
             String coordinates = pubCoordinates
                     .replace("lat/lng: (", "").replace(")", "");
@@ -124,7 +124,8 @@ public class MainActivity extends AppCompatActivity
             fragment = new ContentMain();
             entra = true;
         } else if (id == R.id.maps) {
-            i = new Intent(this, GoogleMaps.class);
+            toolbar.setTitle("Google Maps");
+            fragment = new GoogleMaps();
         } else if (id == R.id.search_user) {
             toolbar.setTitle("Búscaqueda de usuarios");
             fragment = new UserSearch();
