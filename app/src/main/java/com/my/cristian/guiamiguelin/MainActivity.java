@@ -1,7 +1,8 @@
 package com.my.cristian.guiamiguelin;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -94,11 +95,12 @@ public class MainActivity extends AppCompatActivity
     @NonNull
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Intent i = null;
         android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Fragment fragment = null;
         boolean entra = false;
+        boolean logout = id == R.id.logout;
 
+        if(logout == false) // Si he pulsado cerrar sesión, aún no cierres todas los fragments
         for(int e=0; e < getFragmentManager().getBackStackEntryCount(); e++)
             getFragmentManager().popBackStack();
 
@@ -109,16 +111,7 @@ public class MainActivity extends AppCompatActivity
             toolbar.setTitle("Iniciar sesión");
             fragment = new Login();
         } else if (id == R.id.logout) {
-            Preferences.savePreferenceString(this, "",
-                    Preferences.PREFERENCE_USER_LOGIN);
-            Preferences.savePreferenceString(this, "",
-                    Preferences.PREFERENCE_USER_NICK);
-            Preferences.savePreferenceString(this, "",
-                    Preferences.PREFERENCE_USER_FULL_NAME);
-            toolbar.setTitle("Guía Miguelín");
-            fragment = new ContentMain();
-            Toast.makeText(this,"Sesión cerrada",
-                    Toast.LENGTH_LONG).show();
+            logout();
         } else if (id == R.id.principal) {
             toolbar.setTitle("Guía Miguelín");
             fragment = new ContentMain();
@@ -127,7 +120,7 @@ public class MainActivity extends AppCompatActivity
             toolbar.setTitle("Google Maps");
             fragment = new GoogleMaps();
         } else if (id == R.id.search_user) {
-            toolbar.setTitle("Búscaqueda de usuarios");
+            toolbar.setTitle("Búsqueda de usuarios");
             fragment = new UserSearch();
             // Hago que el item se seleccione
             NavigationView navigationView = findViewById(R.id.nav_view);
@@ -135,7 +128,7 @@ public class MainActivity extends AppCompatActivity
             itemSearch.setCheckable(true);
             itemSearch.setChecked(true);
         } else if (id == R.id.search_estab) {
-            toolbar.setTitle("Búscaqueda de establecimientos");
+            toolbar.setTitle("Búsqueda de establecimientos");
             fragment = new EstablishmentSearch();
             // Hago que el item se seleccione
             NavigationView navigationView = findViewById(R.id.nav_view);
@@ -143,8 +136,6 @@ public class MainActivity extends AppCompatActivity
             itemSearch.setCheckable(true);
             itemSearch.setChecked(true);
         }
-        if (i != null)
-            startActivity(i);
         if(fragment != null){
             transaction.replace(R.id.contenedor, fragment).addToBackStack(null).commit();
             if(entra)
@@ -154,5 +145,41 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void logout(){
+        final Fragment[] fragment = {null};
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("¿Está seguro de que quiere cerra sesión?")
+                .setCancelable(false)
+                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        continueLogout();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void continueLogout(){
+        for(int e=0; e < getFragmentManager().getBackStackEntryCount(); e++)
+            getFragmentManager().popBackStack();
+
+        android.app.FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        toolbar.setTitle("Guía Miguelín");
+        Fragment fragment = new ContentMain();
+        Preferences.savePreferenceString(this, "", Preferences.PREFERENCE_USER_LOGIN);
+        Preferences.savePreferenceString(this, "", Preferences.PREFERENCE_USER_NICK);
+        Preferences.savePreferenceString(this, "", Preferences.PREFERENCE_USER_FULL_NAME);
+        Toast.makeText(this,"Sesión cerrada",
+                Toast.LENGTH_LONG).show();
+        transaction.replace(R.id.contenedor, fragment).addToBackStack(null).commit();
+        // Para que no se aparezca el fragmente contenMain dos veces
+        getFragmentManager().popBackStack();
     }
 }

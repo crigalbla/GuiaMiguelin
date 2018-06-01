@@ -25,25 +25,45 @@
         </FrameLayout>
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginTop="@dimen/pading_small"
+            android:hint="Nombre de usuario" />
+        <TextView
             android:id="@+id/TVnick"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/pading_small"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginBottom="@dimen/pading_small"
             android:background="@drawable/border"
             android:hint="Nombre de usuario"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginTop="@dimen/pading_small"
+            android:hint="Nombre" />
+        <TextView
             android:id="@+id/TVname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/pading_small"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginBottom="@dimen/pading_small"
             android:background="@drawable/border"
             android:hint="Nombre"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginTop="@dimen/pading_small"
+            android:hint="Apellidos" />
         <TextView
             android:id="@+id/TVsurnames"
             android:layout_width="match_parent"
@@ -51,7 +71,8 @@
             android:hint="Apellidos"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/pading_small"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginBottom="@dimen/pading_small"
             android:background="@drawable/border"/>
 
         <LinearLayout
@@ -59,29 +80,63 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/TVphone"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Teléfono"
-                android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_margin="@dimen/pading_small"
-                android:background="@drawable/border"/>
+                android:orientation="vertical"
+                android:layout_weight="60">
 
-            <TextView
-                android:id="@+id/TVcity"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/pading_small"
+                    android:layout_marginTop="@dimen/pading_small"
+                    android:hint="Teléfono" />
+                <TextView
+                    android:id="@+id/TVphone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Teléfono"
+                    android:maxLines="1"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:layout_marginHorizontal="@dimen/pading_small"
+                    android:layout_marginBottom="@dimen/pading_small"
+                    android:background="@drawable/border"/>
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Ciudad"
-                android:maxLines="1"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_margin="@dimen/pading_small"
-                android:background="@drawable/border"/>
+                android:orientation="vertical"
+                android:layout_weight="40">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/pading_small"
+                    android:layout_marginTop="@dimen/pading_small"
+                    android:hint="Ciudad" />
+                <TextView
+                    android:id="@+id/TVcity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Ciudad"
+                    android:maxLines="1"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:layout_marginHorizontal="@dimen/pading_small"
+                    android:layout_marginBottom="@dimen/pading_small"
+                    android:background="@drawable/border"/>
+            </LinearLayout>
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginTop="@dimen/pading_small"
+            android:hint="Email" />
         <TextView
             android:id="@+id/TVemail"
             android:layout_width="match_parent"
@@ -89,50 +144,57 @@
             android:hint="Email"
             android:maxLines="1"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/pading_small"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginBottom="@dimen/pading_small"
             android:background="@drawable/border"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginTop="@dimen/pading_small"
+            android:hint="Gustos" />
         <TextView
             android:id="@+id/TVpleasures"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Gustos"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/pading_small"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginBottom="@dimen/pading_small"
             android:background="@drawable/border"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginTop="@dimen/pading_small"
+            android:hint="Descripción personal" />
         <TextView
             android:id="@+id/TVdescription"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Descripción personal"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_margin="@dimen/pading_small"
+            android:layout_marginHorizontal="@dimen/pading_small"
+            android:layout_marginBottom="@dimen/pading_small"
             android:background="@drawable/border"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="@dimen/pading_medium"
-            android:gravity="center">
+        <Button
+            android:id="@+id/followeds"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Seguidos"
+            android:theme="@style/buttons" />
 
-            <Button
-                android:id="@+id/BTedit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Editar perfil"
-                android:theme="@style/buttons" />
-
-            <Button
-                android:id="@+id/followeds"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="Seguidos"
-                android:theme="@style/buttons" />
-        </LinearLayout>
-
+        <Button
+            android:id="@+id/BTedit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Editar perfil"
+            android:theme="@style/buttons" />
 
     </LinearLayout>
 

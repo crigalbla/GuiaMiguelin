@@ -83,10 +83,12 @@ public class CreateReview extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.sendReview:
+                String allPuntuations = "012345";
                 if (reviewPuntuation.getText().toString().length() == 0) {
                     Toast.makeText(getActivity(), "Introduzca una puntuación",
                             Toast.LENGTH_SHORT).show();
-                } else if (reviewPuntuation.getText().toString().length() > 1){
+                } else if (reviewPuntuation.getText().toString().length() > 1 ||
+                        !allPuntuations.contains(reviewPuntuation.getText().toString()) ){
                     Toast.makeText(getActivity(), "La puntuación debe de ser de 0 a 5",
                             Toast.LENGTH_LONG).show();
                 } else {
@@ -153,12 +155,17 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            String tipo = getArguments() != null ?
-                    (String) getArguments().get("tipo") : null;
-            String idEstablecimiento = getArguments() != null ?
-                    (String) getArguments().get("id_establecimiento") : null;
+            if(result != null){
+                String tipo = getArguments() != null ?
+                        (String) getArguments().get("tipo") : null;
+                String idEstablecimiento = getArguments() != null ?
+                        (String) getArguments().get("id_establecimiento") : null;
 
-            mongoAPI(tipo + idEstablecimiento, "ESTABLISHMENT");
+                mongoAPI(tipo + idEstablecimiento, "ESTABLISHMENT");
+            }else {
+                Toast.makeText(getActivity(), "Ha habido un problema al crear la reseña",
+                        Toast.LENGTH_LONG).show();
+            }
 
             if (progressDialog != null) {
                 progressDialog.dismiss();
@@ -254,8 +261,13 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
-                    Preferences.PREFERENCE_USER_LOGIN), "GET-USER");
+            if(result != "Actualización fallida"){
+                mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
+                        Preferences.PREFERENCE_USER_LOGIN), "GET-USER");
+            }else {
+                Toast.makeText(getActivity(), "Ha habido un problema al actuliazar los datos " +
+                                "del establecimiento", Toast.LENGTH_LONG).show();
+            }
 
             if (progressDialog != null) {
                 progressDialog.dismiss();
@@ -367,11 +379,17 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            User user = gson.fromJson(result, User.class);
-            putUser.setReviews(user.getReviews());  // Solo me hacen falta las reviews
+            if(result != null){
+                User user = gson.fromJson(result, User.class);
+                putUser.setReviews(user.getReviews());  // Solo me hacen falta las reviews
 
-            mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
-                    Preferences.PREFERENCE_USER_LOGIN), "PUT-USER");
+                mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
+                        Preferences.PREFERENCE_USER_LOGIN), "PUT-USER");
+            }else {
+                Toast.makeText(getActivity(), "Ha habido un problema al obtner el usuario " +
+                                "creador de la reseña"
+                        , Toast.LENGTH_LONG).show();
+            }
 
             if (progressDialog != null) {
                 progressDialog.dismiss();
@@ -441,11 +459,15 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            // Para terminar volemos a la actividad anterior, ahora debe de aparecer la reseña
-            Toast.makeText(getActivity(), "Reseña creada, refresca la vista haciendo scroll " +
-                            "para ver",
-                    Toast.LENGTH_LONG).show();
-            getActivity().onBackPressed();
+            if(result != "Actualización fallida"){
+                // Para terminar volemos a la actividad anterior, ahora debe de aparecer la reseña
+                Toast.makeText(getActivity(), "Reseña creada, refresca la vista haciendo " +
+                                "scroll para ver", Toast.LENGTH_LONG).show();
+                getActivity().onBackPressed();
+            }else {
+                Toast.makeText(getActivity(), "Ha habido un problema al actualizar la " +
+                        "reseña en el perfil del usuario", Toast.LENGTH_LONG).show();
+            }
 
             if (progressDialog != null) {
                 progressDialog.dismiss();
