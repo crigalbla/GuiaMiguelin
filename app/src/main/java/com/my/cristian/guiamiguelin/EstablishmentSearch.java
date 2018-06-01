@@ -45,6 +45,8 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
     RecyclerView recycleRestaurants;
     @BindView(R.id.layoutRestaurant)
     LinearLayout layoutRestaurant;
+    @BindView(R.id.layoutPub)
+    LinearLayout layoutPub;
     Unbinder unbinder;
 
     private static final Gson gson = new Gson();
@@ -138,8 +140,18 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         for (Pub p : pubs) {
             adapter1.add(p);
         }
+        if(pubs.length > 4) {
+            ViewGroup.LayoutParams params = layoutPub.getLayoutParams();
+            params.height = 1200;
+            layoutPub.setLayoutParams(params);
+        }
         for (Restaurant r : restaurants) {
             adapter2.add(r);
+        }
+        if(restaurants.length > 4) {
+            ViewGroup.LayoutParams params = layoutRestaurant.getLayoutParams();
+            params.height = 1200;
+            layoutRestaurant.setLayoutParams(params);
         }
     }
 

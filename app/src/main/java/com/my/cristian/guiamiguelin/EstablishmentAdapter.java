@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,7 +24,6 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
     private List<Establishment> establishments;
     private Context context;
     private OnItemClickListener listener;
-    private List<String> ids = new ArrayList<String>();
 
     public EstablishmentAdapter(List<Establishment> establishments, OnItemClickListener listener) {
         this.establishments = establishments;
@@ -55,7 +53,7 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
         }
 
         if(establishment.getId().length() > 23) // TODO quitar if cuando esté hecho la recomendación en la página principal
-            ids.add(establishment.getId()); // Guardo el id
+            holder.idEstablishment.setText(establishment.getId()); // Guardo el id
     }
 
     @Override
@@ -71,7 +69,7 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
     }
 
     public String getId(Integer position){
-        return ids.get(position);
+        return establishments.get(position).getId(); //TODO aquí está el problema del array
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -82,6 +80,8 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
         AppCompatTextView nameEstablishment;
         @BindView(R.id.adrresEstablishment)
         AppCompatTextView adrresEstablishment;
+        @BindView(R.id.idEstablishment)
+        AppCompatTextView idEstablishment;
         @BindView(R.id.puntuation)
         AppCompatTextView puntuation;
         @BindView(R.id.rlyEstablishment)

@@ -44,6 +44,17 @@
             android:layout_below="@id/nameEstablishment"/>
 
         <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/idEstablishment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_margin="@dimen/pading_small"
+            android:layout_toStartOf="@+id/puntuation"
+            android:layout_toEndOf="@id/imgListEstablishment"
+            android:layout_below="@id/nameEstablishment"/>
+
+        <android.support.v7.widget.AppCompatTextView
             android:id="@+id/puntuation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
