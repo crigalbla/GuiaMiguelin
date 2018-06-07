@@ -133,6 +133,7 @@ public class ShowEstablishment extends Fragment {
         }
     }
 
+    // Método del swipeRefresh
     private void refreshContent() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -144,6 +145,7 @@ public class ShowEstablishment extends Fragment {
         }, 1000);
     }
 
+    // Cargo la vista por primera
     private void firstOrRecharge() {
         String pubId = getArguments() != null ?
                 (String) getArguments().get("pubId") : null;
@@ -191,25 +193,43 @@ public class ShowEstablishment extends Fragment {
                 if (Preferences.obtenerPreferenceString(getActivity(),
                         Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
 
-                    getActivity().setTitle("Crear reseña");
-                    fragment = new CreateReview();
-                    if (pub != null) {
-                        args.putString("nombre_establecimiento", pub.getName());
-                        args.putString("id_establecimiento", pub.getId());
-                        args.putString("reseñas", pub.getReviews().toString());
-                        args.putString("tipo", "/pubs/");
-                        args.putString("nota_media", pub.getAverage().toString());
+                    boolean permiso = true;
+                    for(Review r: reviews){
+                        String a = Preferences.obtenerPreferenceString(getActivity(),
+                                Preferences.PREFERENCE_USER_NICK);
+                        String b = r.getAuthor();
+                        boolean c = a.equals(b);
+                        if(Preferences.obtenerPreferenceString(getActivity(),
+                                Preferences.PREFERENCE_USER_NICK).equals(r.getAuthor())){
+                            Toast.makeText(getActivity(),
+                                    "Solo se permite dejar una reseña por establecimiento",
+                                    Toast.LENGTH_LONG).show();
+                            permiso = false;
+                            break;
+                        }
                     }
-                    if (restaurant != null) {
-                        args.putString("nombre_establecimiento", restaurant.getName());
-                        args.putString("id_establecimiento", restaurant.getId());
-                        args.putString("reseñas", restaurant.getReviews().toString());
-                        args.putString("tipo", "/restaurants/");
-                        args.putString("nota_media", restaurant.getAverage().toString());
+
+                    if(permiso){
+                        getActivity().setTitle("Crear reseña");
+                        fragment = new CreateReview();
+                        if (pub != null) {
+                            args.putString("nombre_establecimiento", pub.getName());
+                            args.putString("id_establecimiento", pub.getId());
+                            args.putString("reseñas", pub.getReviews().toString());
+                            args.putString("tipo", "/pubs/");
+                            args.putString("nota_media", pub.getAverage().toString());
+                        }
+                        if (restaurant != null) {
+                            args.putString("nombre_establecimiento", restaurant.getName());
+                            args.putString("id_establecimiento", restaurant.getId());
+                            args.putString("reseñas", restaurant.getReviews().toString());
+                            args.putString("tipo", "/restaurants/");
+                            args.putString("nota_media", restaurant.getAverage().toString());
+                        }
+                        fragment.setArguments(args);
+                        getActivity().getFragmentManager().beginTransaction()
+                                .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
                     }
-                    fragment.setArguments(args);
-                    getActivity().getFragmentManager().beginTransaction()
-                            .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
                 } else {
                     Toast.makeText(getActivity(),
                             "Debes de iniciar sesión para poder dejar una reseña",

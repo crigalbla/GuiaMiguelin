@@ -312,7 +312,7 @@ public class Register extends Fragment {
                 bufferedWriter.flush();
 
                 // Leo la respuesta del servidor
-                InputStream inputStream = urlConnection.getInputStream(); // TODO esta línea peta...
+                InputStream inputStream = urlConnection.getInputStream();
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {

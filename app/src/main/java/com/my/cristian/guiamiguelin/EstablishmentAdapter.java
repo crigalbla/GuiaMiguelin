@@ -53,7 +53,7 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
         }
 
         if(establishment.getId().length() > 23) // TODO quitar if cuando esté hecho la recomendación en la página principal
-            holder.idEstablishment.setText(establishment.getId()); // Guardo el id
+            holder.idEstablishment.setText(establishment.getId());
     }
 
     @Override
@@ -69,7 +69,7 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
     }
 
     public String getId(Integer position){
-        return establishments.get(position).getId(); //TODO aquí está el problema del array
+        return establishments.get(position).getId();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

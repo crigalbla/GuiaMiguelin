@@ -7,10 +7,6 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ContentMain">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
     <LinearLayout
         android:id="@+id/lyPrincipal"
         android:layout_width="match_parent"
@@ -22,9 +18,16 @@
             android:layout_width="match_parent"
             android:layout_height="164dp"
             android:contentDescription="Logo"
-            app:srcCompat="@mipmap/logo"
-            android:paddingBottom="@dimen/pading_medium"/>
+            app:srcCompat="@mipmap/logo"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recomendado para ti"
+            android:gravity="center"
+            android:background="#ff9d00"
+            android:textColor="#ffffff"
+            android:textAppearance="?android:attr/textAppearanceLarge"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycle"
             android:layout_width="match_parent"
@@ -35,6 +38,4 @@
         </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
-    </ScrollView>
-
 </android.support.constraint.ConstraintLayout>

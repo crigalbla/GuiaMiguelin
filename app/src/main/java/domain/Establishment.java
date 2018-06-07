@@ -6,7 +6,7 @@ import java.util.List;
  * Created by Cristian on 02/03/2018.
  */
 
-public class Establishment {
+public class Establishment implements Comparable<Establishment> {
 
     private String _id;
     private String name;
@@ -55,6 +55,17 @@ public class Establishment {
 
     public Establishment(){
 
+    }
+
+    @Override
+    public int compareTo(Establishment e) {
+        if (average > e.average) {
+            return -1;
+        }
+        if (average < e.average) {
+            return 1;
+        }
+        return 0;
     }
 
     public String getId() {
