@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -32,6 +31,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import domain.Establishment;
+import domain.Pub;
+import domain.Restaurant;
+import domain.Review;
 import domain.User;
 
 
@@ -43,10 +45,15 @@ public class ContentMain extends Fragment implements OnItemClickListener {
 
     private static final Gson gson = new Gson();
     private User userLogged = null;
-    private Establishment[] pubs = null;
-    private Establishment[] restaurants = null;
-    private String average = "4";
+    private Pub[] pubs = null;
+    private Restaurant[] restaurants = null;
+    private Review[] reviews = null;
     private Integer numberPubsOnAdapter = 0;
+    private String types = "";
+    // Parámetros de configuración
+    private String average = "4";
+    private Double goodAverage = 2.5;
+    private Double goodReview = 3.5;
 
     private EstablishmentAdapter adapter;
 
@@ -120,25 +127,51 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         numberPubsOnAdapter = 0;
         Integer countPubs = pubs.length;
         Integer countRestaurants = restaurants.length;
-        // Ordeno los establecimientos dando importanta a la media de valoraciones
+        // Ordeno los establecimientos dando importancia a la media de valoraciones
         Arrays.sort(pubs);
         Arrays.sort(restaurants);
 
-        for (int i = 0; i < countPubs; i++) {
-            if(i < 2) {
-                adapter.add(pubs[i]);
-                numberPubsOnAdapter++;
+        if(userLogged == null){ // Recomiendo 4 en total
+            for (int i = 0; i < countPubs; i++) {
+                if(i < 2) {
+                    adapter.add(pubs[i]);
+                    numberPubsOnAdapter++;
+                }
+                if(i >= 2 && i < 4-countRestaurants) {
+                    adapter.add(pubs[i]);
+                    numberPubsOnAdapter++;
+                }
             }
-            if(i >= 2 && i < 4-countRestaurants) {
-                adapter.add(pubs[i]);
-                numberPubsOnAdapter++;
+            for (int i = 0; i < countRestaurants; i++) {
+                if(i < 2)
+                    adapter.add(restaurants[i]);
+                if(i >= 2 && i < 4-countPubs)
+                    adapter.add(restaurants[i]);
             }
-        }
-        for (int i = 0; i < countRestaurants; i++) {
-            if(i < 2)
-                adapter.add(restaurants[i]);
-            if(i >= 2 && i < 4-countPubs)
-                adapter.add(restaurants[i]);
+
+        }else{ // Caso en el que estoy logueado como usuario (recomiendo 6 en total)
+            for (int i = 0; i < countPubs; i++) {
+                // Para que no recomiende establecimientos donde ya se ha realizado una review
+                if(pubs[i].getPTRS() >= 0) {
+                    if (i < 3) {
+                        adapter.add(pubs[i]);
+                        numberPubsOnAdapter++;
+                    }
+                    if (i >= 3 && i < 6 - countRestaurants) {
+                        adapter.add(pubs[i]);
+                        numberPubsOnAdapter++;
+                    }
+                }
+            }
+            for (int i = 0; i < countRestaurants; i++) {
+                // Para que no recomiende establecimientos donde ya se ha realizado una review
+                if(restaurants[i].getPTRS() >= 0) {
+                    if (i < 3)
+                        adapter.add(restaurants[i]);
+                    if (i >= 3 && i < 6 - countPubs)
+                        adapter.add(restaurants[i]);
+                }
+            }
         }
     }
 
@@ -148,7 +181,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                 Preferences.PREFERENCE_USER_LOGIN);
 
         if(userIdLogged != null && userIdLogged.length() > 0){
-            mongoAPI("/users/" + userIdLogged, "GET");
+            mongoAPI("/users/" + userIdLogged, "USER");
         }else{
             mongoAPI("/pubs/mostPopular?average=" + average, "ESTABLISHMENTS");
         }
@@ -198,6 +231,9 @@ public class ContentMain extends Fragment implements OnItemClickListener {
             case ("ESTABLISHMENTS"):
                 new ContentMain.GetEstablishmentsTask().execute(URL_BASE + url);
                 break;
+            case ("REVIEWS"):
+                new ContentMain.GetReviewsTask().execute(URL_BASE + url);
+                break;
         }
     }
 
@@ -233,18 +269,12 @@ public class ContentMain extends Fragment implements OnItemClickListener {
 
             try {
                 userLogged = gson.fromJson(result, User.class);
-                //TODO idea del sistema de recomendación híbrido:
-                //La idea es guardar los esblecimientos en un map donde key es la puntuación y value el establecimiento
-                //1. Ordeno TODOS los establecimientos por nota media y les doy tantos puntos como nota media tengan
-                //2. Miro el tipo de establecimientos que le gusta al usuario (eso es que le haya dado una nota de 3.5 o más) y a cada establecimiento de la lista de punto 1 que coincida con el tipo le sumo 4 puntos más
-                // SEGUNDA PARTE
-                //3. En los establecimientos que le gustan al usuario del punto 2, busco a qué otros usuarios también le ha gustado.
-                //4. A esos usuarios les gustará otros establecimientos, a esos establecimientos se les sumará la multiplicacion de 0.5 por la puntuación que le hayan dado. Si el usuario recomendado sigue al usuario del que se está sacando información, el factor multiplicativo pasa a ser 0.75 puntos.
-//                mongoAPI("/pubs/mostPopular?average=" + average, "ESTABLISHMENTS");
+                mongoAPI("/pubs/", "ESTABLISHMENTS");
 
             } catch (Throwable throwable) {
-                Toast.makeText(getActivity(), "Ha habido un problema al obtener la " +
-                                "identificación del usuario", Toast.LENGTH_LONG).show();
+                // TODO esto peta cuando abro una pagina principal nuevamente...
+//                Toast.makeText(getActivity(), "Ha habido un problema al obtener la " +
+//                                "identificación del usuario", Toast.LENGTH_LONG).show();
             }
 
             // Cerrar ventana de diálogo
@@ -317,15 +347,41 @@ public class ContentMain extends Fragment implements OnItemClickListener {
 
             try {
                 if(pubs == null){
-                    pubs = gson.fromJson(result, Establishment[].class);
-                    mongoAPI("/restaurants/mostPopular?average=" + average,
-                            "ESTABLISHMENTS");
-                }else {
-                    restaurants = gson.fromJson(result, Establishment[].class);
+                    pubs = gson.fromJson(result, Pub[].class);
+                    //1.1. Les doy puntos en función de la nota media que tengan
+                    for (int i = 0; i < pubs.length; i++) {//TODO solo cuando sea buena puntuación
+                        if (pubs[i].getReviews().size() > 0) {
+                            pubs[i].setPTRS( (pubs[i].getAverage() - goodAverage)*2 );
+                        }else {
+                            pubs[i].setPTRS(0.0);
+                        }
+                    }
 
-                    configAdapter();
-                    configReclyclerView();
-                    generateEstablishment();
+                    if(userLogged != null){ // Caso de esión iniciada
+                        mongoAPI("/restaurants/","ESTABLISHMENTS");
+                    }else {
+                        mongoAPI("/restaurants/mostPopular?average=" + average,
+                                "ESTABLISHMENTS");
+                    }
+                }else {
+                    restaurants = gson.fromJson(result, Restaurant[].class);
+                    //1.1. Les doy puntos en función de la nota media que tengan
+                    for (int i = 0; i < restaurants.length; i++){
+                        if (restaurants[i].getReviews().size() > 0) {
+                            restaurants[i].setPTRS( (restaurants[i].getAverage() - goodAverage)*2 );
+                        }else {
+                            restaurants[i].setPTRS(0.0);
+                        }
+                    }
+
+                    if(userLogged != null){ // Caso de sesión iniciada
+                        mongoAPI("/reviews/recomendationSystem/" + userLogged.getId(),
+                                "REVIEWS");
+                    }else{
+                        configAdapter();
+                        configReclyclerView();
+                        generateEstablishment();
+                    }
                 }
 
             } catch (Throwable throwable) {
@@ -334,6 +390,122 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                 // TODO esto peta cuando abro una pagina principal nuevamente...
 //                Toast.makeText(getActivity(), "Ha habido un problema al obtener los " +
 //                        "establecimientos", Toast.LENGTH_LONG).show();
+            }
+
+            // Cerrar ventana de diálogo
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
+        }
+
+        private String getData(String urlPath) throws IOException {
+            StringBuilder result = new StringBuilder();
+            BufferedReader bufferedReader = null;
+
+            try {
+                // Iniciar, configurar solicitud y conectar al servidor
+                URL url = new URL(urlPath);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000 /* milisegundos */);
+                urlConnection.setConnectTimeout(10000 /* milisegundos */);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Content-Type", "application/json");// Cabecera de la petición
+                urlConnection.connect();
+
+                // Leer datos de respuesta del servidor
+                InputStream inputStream = urlConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+
+            } finally {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+            }
+
+            return result.toString();
+        }
+    }
+
+    // GET reviews ---------------------------------------------------------------------------------
+
+    @SuppressLint("StaticFieldLeak")
+    class GetReviewsTask extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Obteniendo los mejores establecimientos para ti...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                return getData(params[0]);
+            } catch (IOException ex) {
+                return "Error de conexión";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try {
+                reviews = gson.fromJson(result, Review[].class);
+
+                //1.2. 'Elimino' TODOS los establecimientos a los que haya ido el usuario.
+                for (int i = 0; i < pubs.length; i++) {
+                    // Si ya ha hecho una review BUENA, guardame el tipo de establecimiento
+                    String a = "";
+                    for(Review rev: reviews) {
+                        a = rev.getEstablishment();
+                        if (rev.getEstablishment().contains(pubs[i].getId())) {
+                            pubs[i].setPTRS(-1000.0); // Para que nunca lo recomiende
+                            // Si fue una buena review lo tendremos en cuenta luego
+                            if (rev.getPuntuation() > goodReview)
+                                types = types + ", " + pubs[i].getTypePub().toString();
+                            break;
+                        }
+                    }
+                }
+                for (int i = 0; i < restaurants.length; i++){
+                    // Si ya ha hecho una review BUENA, guardame el tipo de establecimiento
+                    for(Review rev: reviews)
+                        if (rev.getEstablishment().contains(restaurants[i].getId())) {
+                            restaurants[i].setPTRS(-1000.0); // Para que nunca lo recomiende
+                            if(rev.getPuntuation() > goodReview)
+                                types = types + ", " + pubs[i].getTypePub().toString();
+                            break;
+                        }
+                }
+
+                //2. Miro los tipos de establecimientos que le gustan al usuario (eso es que le
+                // haya dado una nota mayor o igual que goodReview) y a cada establecimiento de la lista del
+                // punto 1 que coincida con el tipo le sumo 4 puntos más
+                for (int i = 0; i < pubs.length; i++) {
+                    if (types.contains(pubs[i].getTypePub().toString()))
+                        pubs[i].setPTRS(pubs[i].getPTRS() + 4);
+                }
+                for (int i = 0; i < restaurants.length; i++)
+                    if (types.contains(restaurants[i].getTypeRestaurant().toString()))
+                        restaurants[i].setPTRS(restaurants[i].getPTRS() + 4);
+
+                //TODO hace la segunda parte
+                configAdapter();
+                configReclyclerView();
+                generateEstablishment();
+            } catch (Throwable throwable) {
+                // TODO
             }
 
             // Cerrar ventana de diálogo

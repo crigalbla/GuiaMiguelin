@@ -20,6 +20,8 @@ public class Establishment implements Comparable<Establishment> {
     private Double average;
     private List<String> reviews;
     private String carte;
+    //Atributos adicionales para poder hacer el sistema de recomendación
+    private Double PTRS; //Puntuation to recomend system
 
     public Establishment(String _id, String name, String address, String description,
                          Double latitude, Double longitude, String opening, String closing,
@@ -59,10 +61,10 @@ public class Establishment implements Comparable<Establishment> {
 
     @Override
     public int compareTo(Establishment e) {
-        if (average > e.average) {
+        if (PTRS > e.PTRS) {
             return -1;
         }
-        if (average < e.average) {
+        if (PTRS < e.PTRS) {
             return 1;
         }
         return 0;
@@ -162,5 +164,13 @@ public class Establishment implements Comparable<Establishment> {
 
     public void setCarte(String carte) {
         this.carte = carte;
+    }
+
+    public Double getPTRS() {
+        return PTRS;
+    }
+
+    public void setPTRS(Double PTRS) {
+        this.PTRS = PTRS;
     }
 }
