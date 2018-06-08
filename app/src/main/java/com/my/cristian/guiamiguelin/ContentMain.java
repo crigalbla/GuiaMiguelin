@@ -48,12 +48,13 @@ public class ContentMain extends Fragment implements OnItemClickListener {
     private Pub[] pubs = null;
     private Restaurant[] restaurants = null;
     private Review[] reviews = null;
+    private User[] users = null;
     private Integer numberPubsOnAdapter = 0;
-    private String types = "";
     // Parámetros de configuración
     private String average = "4";
     private Double goodAverage = 2.5;
     private Double goodReview = 3.5;
+    private Double factorNotFollow = 0.5;
 
     private EstablishmentAdapter adapter;
 
@@ -226,7 +227,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         // Local http://192.168.1.106:1234/
         switch (type) {
             case ("USER"):
-                new ContentMain.GetDataTask().execute(URL_BASE + url);
+                new ContentMain.GetUserTask().execute(URL_BASE + url);
                 break;
             case ("ESTABLISHMENTS"):
                 new ContentMain.GetEstablishmentsTask().execute(URL_BASE + url);
@@ -234,13 +235,19 @@ public class ContentMain extends Fragment implements OnItemClickListener {
             case ("REVIEWS"):
                 new ContentMain.GetReviewsTask().execute(URL_BASE + url);
                 break;
+            case ("REVIEWS2"):
+                new ContentMain.GetReviews2Task().execute(URL_BASE + url);
+                break;
+            case ("USERS"):
+                new ContentMain.GetUsersTask().execute(URL_BASE + url);
+                break;
         }
     }
 
     // GET user ------------------------------------------------------------------------------------
 
     @SuppressLint("StaticFieldLeak")
-    class GetDataTask extends AsyncTask<String, Void, String> {
+    class GetUserTask extends AsyncTask<String, Void, String> {
 
         ProgressDialog progressDialog;
 
@@ -325,10 +332,6 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("Obteniendo los mejores establecimientos para ti...");
-            progressDialog.show();
         }
 
         @Override
@@ -385,16 +388,9 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                 }
 
             } catch (Throwable throwable) {
-                pubs = null;
-                restaurants = null;
                 // TODO esto peta cuando abro una pagina principal nuevamente...
 //                Toast.makeText(getActivity(), "Ha habido un problema al obtener los " +
 //                        "establecimientos", Toast.LENGTH_LONG).show();
-            }
-
-            // Cerrar ventana de diálogo
-            if (progressDialog != null) {
-                progressDialog.dismiss();
             }
         }
 
@@ -440,6 +436,115 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                return getData(params[0]);
+            } catch (IOException ex) {
+                return "Error de conexión";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try {
+                reviews = gson.fromJson(result, Review[].class);
+                String values = "";
+                String types = "";
+
+                //1.2. 'Elimino' TODOS los establecimientos a los que haya ido el usuario.
+                for (int i = 0; i < pubs.length; i++) {
+                    // Si ya ha hecho una review BUENA, guardame el tipo de establecimiento
+                    for(Review rev: reviews) {
+                        if (rev.getEstablishment().contains(pubs[i].getId())) {
+                            pubs[i].setPTRS(-1000.0); // Para que nunca lo recomiende
+                            // Si fue una buena review lo tendremos en cuenta en el punto 2
+                            if (rev.getPuntuation() > goodReview) {
+                                types = types + ", " + pubs[i].getTypePub().toString();
+                                values = values + "-" + pubs[i].getId();
+                            }
+                            break;
+                        }
+                    }
+                }
+                for (int i = 0; i < restaurants.length; i++){
+                    // Si ya ha hecho una review BUENA, guardame el tipo de establecimiento
+                    for(Review rev: reviews)
+                        if (rev.getEstablishment().contains(restaurants[i].getId())) {
+                            restaurants[i].setPTRS(-1000.0); // Para que nunca lo recomiende
+                            // Si fue una buena review lo tendremos en cuenta en el punto 2
+                            if(rev.getPuntuation() > goodReview){
+                                types = types + ", " + pubs[i].getTypePub().toString();
+                                values = values + "-" + restaurants[i].getId();
+                            }
+                            break;
+                        }
+                }
+
+                //2. Miro los tipos de establecimientos que le gustan al usuario (eso es que le
+                // haya dado una nota mayor o igual que goodReview) y a cada establecimiento de la lista del
+                // punto 1 que coincida con el tipo le sumo 4 puntos más
+                for (int i = 0; i < pubs.length; i++)
+                    if (types.contains(pubs[i].getTypePub().toString()))
+                        pubs[i].setPTRS(pubs[i].getPTRS() + 4);
+
+                for (int i = 0; i < restaurants.length; i++)
+                    if (types.contains(restaurants[i].getTypeRestaurant().toString()))
+                        restaurants[i].setPTRS(restaurants[i].getPTRS() + 4);
+
+                mongoAPI("/reviews/recomendationSystem?values=" + values, "REVIEWS2");
+            } catch (Throwable throwable) {
+                // TODO
+            }
+        }
+
+        private String getData(String urlPath) throws IOException {
+            StringBuilder result = new StringBuilder();
+            BufferedReader bufferedReader = null;
+
+            try {
+                // Iniciar, configurar solicitud y conectar al servidor
+                URL url = new URL(urlPath);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000 /* milisegundos */);
+                urlConnection.setConnectTimeout(10000 /* milisegundos */);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Content-Type", "application/json");// Cabecera de la petición
+                urlConnection.connect();
+
+                // Leer datos de respuesta del servidor
+                InputStream inputStream = urlConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+
+            } finally {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+            }
+
+            return result.toString();
+        }
+    }
+
+    // GET reviews2 --------------------------------------------------------------------------------
+
+    @SuppressLint("StaticFieldLeak")
+    class GetReviews2Task extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
 
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Obteniendo los mejores establecimientos para ti...");
@@ -463,47 +568,49 @@ public class ContentMain extends Fragment implements OnItemClickListener {
             try {
                 reviews = gson.fromJson(result, Review[].class);
 
-                //1.2. 'Elimino' TODOS los establecimientos a los que haya ido el usuario.
-                for (int i = 0; i < pubs.length; i++) {
-                    // Si ya ha hecho una review BUENA, guardame el tipo de establecimiento
-                    String a = "";
-                    for(Review rev: reviews) {
-                        a = rev.getEstablishment();
-                        if (rev.getEstablishment().contains(pubs[i].getId())) {
-                            pubs[i].setPTRS(-1000.0); // Para que nunca lo recomiende
-                            // Si fue una buena review lo tendremos en cuenta luego
-                            if (rev.getPuntuation() > goodReview)
-                                types = types + ", " + pubs[i].getTypePub().toString();
-                            break;
+                // Para obtener las reviews de los establecimientos que me han gustado
+                if(users == null){
+                    String values = "";
+
+                    for(Review r: reviews)
+                        if(!values.contains(r.getAuthor())) {
+                            if (values.length() > 0) {
+                                values = values + "-" + r.getAuthor();
+                            }else {
+                                values = r.getAuthor();
+                            }
+                        }
+
+                    mongoAPI("/users/recomendationSystem?values=" + values, "USERS");
+                }else { // Para obtener las reviews de los usuarios con mis mismos gustos
+                    Double factor = factorNotFollow;
+                    Boolean entra = true;
+                    for(Review rev: reviews){
+                        for(Pub p: pubs){
+                            if(rev.getEstablishment().equals(p.getId())){
+                                if(userLogged.getReviews().contains(rev.getAuthor()))
+                                    factor = 0.75;
+                                double morePTRS = (rev.getPuntuation() - goodAverage)*factor;
+                                p.setPTRS(p.getPTRS() + morePTRS);
+                                entra = false; // Para que coja la siguiente review
+                                break;// Para que no siga buscando pubs si ya ha enoctrado la review
+                            }
+                        }
+                        if(entra)
+                        for(Restaurant r: restaurants){
+                            if(rev.getEstablishment().equals(r.getId())){
+                                if(userLogged.getReviews().contains(rev.getAuthor()))
+                                    factor = 0.75;
+                                double morePTRS = (rev.getPuntuation() - goodAverage)*factor;
+                                r.setPTRS(r.getPTRS() + morePTRS);
+                                break;// Para que no siga buscando rest si ya ha enoctrado la review
+                            }
                         }
                     }
+                    configAdapter();
+                    configReclyclerView();
+                    generateEstablishment();
                 }
-                for (int i = 0; i < restaurants.length; i++){
-                    // Si ya ha hecho una review BUENA, guardame el tipo de establecimiento
-                    for(Review rev: reviews)
-                        if (rev.getEstablishment().contains(restaurants[i].getId())) {
-                            restaurants[i].setPTRS(-1000.0); // Para que nunca lo recomiende
-                            if(rev.getPuntuation() > goodReview)
-                                types = types + ", " + pubs[i].getTypePub().toString();
-                            break;
-                        }
-                }
-
-                //2. Miro los tipos de establecimientos que le gustan al usuario (eso es que le
-                // haya dado una nota mayor o igual que goodReview) y a cada establecimiento de la lista del
-                // punto 1 que coincida con el tipo le sumo 4 puntos más
-                for (int i = 0; i < pubs.length; i++) {
-                    if (types.contains(pubs[i].getTypePub().toString()))
-                        pubs[i].setPTRS(pubs[i].getPTRS() + 4);
-                }
-                for (int i = 0; i < restaurants.length; i++)
-                    if (types.contains(restaurants[i].getTypeRestaurant().toString()))
-                        restaurants[i].setPTRS(restaurants[i].getPTRS() + 4);
-
-                //TODO hace la segunda parte
-                configAdapter();
-                configReclyclerView();
-                generateEstablishment();
             } catch (Throwable throwable) {
                 // TODO
             }
@@ -511,6 +618,76 @@ public class ContentMain extends Fragment implements OnItemClickListener {
             // Cerrar ventana de diálogo
             if (progressDialog != null) {
                 progressDialog.dismiss();
+            }
+        }
+
+        private String getData(String urlPath) throws IOException {
+            StringBuilder result = new StringBuilder();
+            BufferedReader bufferedReader = null;
+
+            try {
+                // Iniciar, configurar solicitud y conectar al servidor
+                URL url = new URL(urlPath);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setReadTimeout(10000 /* milisegundos */);
+                urlConnection.setConnectTimeout(10000 /* milisegundos */);
+                urlConnection.setRequestMethod("GET");
+                urlConnection.setRequestProperty("Content-Type", "application/json");// Cabecera de la petición
+                urlConnection.connect();
+
+                // Leer datos de respuesta del servidor
+                InputStream inputStream = urlConnection.getInputStream();
+                bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    result.append(line).append("\n");
+                }
+
+            } finally {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+            }
+
+            return result.toString();
+        }
+    }
+
+    // GET users -----------------------------------------------------------------------------------
+
+    @SuppressLint("StaticFieldLeak")
+    class GetUsersTask extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                return getData(params[0]);
+            } catch (IOException ex) {
+                return "Error de conexión";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            try {
+                users = gson.fromJson(result, User[].class);
+                String values = "";
+                for(User u: users)
+                    values = values + "-" + u.getId();
+
+                mongoAPI("/reviews/recomendationSystem2?values=", "REVIEWS2");
+            } catch (Throwable throwable) {
+                // TODO
             }
         }
 
