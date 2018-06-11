@@ -175,13 +175,17 @@ public class Register extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            existUser = gson.fromJson(result, User.class);
-            if (existUser == null) {
+            try{
+                existUser = gson.fromJson(result, User.class);
+                if (existUser == null) {
                     mongoAPI("/users/", "POST");
-            } else {
-                Toast.makeText(getActivity(),
-                        "El nombre de usuario " + existUser.getNick() + " ya existe",
-                        Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(getActivity(),
+                            "El nombre de usuario " + existUser.getNick() + " ya existe",
+                            Toast.LENGTH_LONG).show();
+                }
+            } catch (Throwable throwable) {
+                Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
 
             // Cerrar ventana de diálogo

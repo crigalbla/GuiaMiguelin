@@ -162,11 +162,16 @@ public class UserSearch extends Fragment implements OnItemClickListener2 {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            users = gson.fromJson(result, User[].class);
+            try {
+                users = gson.fromJson(result, User[].class);
 
-            configAdapter();
-            configReclyclerView();
-            generateUser();
+                configAdapter();
+                configReclyclerView();
+                generateUser();
+            } catch (Throwable throwable) {
+                Toast.makeText(getActivity(), "Error al parsear usuarios",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             // Cerrar ventana de diálogo
             if (progressDialog != null) {

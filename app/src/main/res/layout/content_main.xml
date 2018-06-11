@@ -28,14 +28,19 @@
             android:background="#ff9d00"
             android:textColor="#ffffff"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycle"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_recomendation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/border"
-            tools:listitem="@layout/establishments">
+            android:layout_height="match_parent">
 
-        </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border"
+                tools:listitem="@layout/establishments">
+            </android.support.v7.widget.RecyclerView>
+        </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -114,21 +114,30 @@ public class Profile extends Fragment {
                         .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
             }
         } else {
-            getActivity().setTitle("Editar perfil");
-            getActivity().getFragmentManager().beginTransaction()
-                    .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
+            if(userProfile != null){
+                getActivity().setTitle("Editar perfil");
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, new EditProfile()).addToBackStack(null).commit();
+            }else {
+                Toast.makeText(getActivity(), "Error", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
     @OnClick(R.id.followeds)
     public void onViewClicked() {
-        getActivity().setTitle("Usarios seguidos");
-        Fragment fragment = new Followeds();
-        Bundle args = new Bundle();
-        args.putString("userId", userProfile.getId());
-        fragment.setArguments(args);
-        getActivity().getFragmentManager().beginTransaction()
-                .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
+        if(userProfile != null){
+            getActivity().setTitle("Usarios seguidos");
+            Fragment fragment = new Followeds();
+            Bundle args = new Bundle();
+            args.putString("userId", userProfile.getId());
+            fragment.setArguments(args);
+            getActivity().getFragmentManager().beginTransaction()
+                    .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
+        }else {
+            Toast.makeText(getActivity(), "Error", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     // Peticiones a la API -------------------------------------------------------------------------
@@ -184,8 +193,7 @@ public class Profile extends Fragment {
                 continueGet1();
 
             } catch (Throwable throwable) {
-                Toast.makeText(getActivity(), "Ha habido un problema con la aplicación",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_LONG).show();
             }
 
             // Cerrar ventana de diálogo
@@ -296,7 +304,7 @@ public class Profile extends Fragment {
                 continueGet2();
 
             } catch (Throwable throwable) {
-                Toast.makeText(getActivity(), "Ha habido un problema con la aplicación",
+                Toast.makeText(getActivity(), "Error de conexión",
                         Toast.LENGTH_LONG).show();
             }
 
@@ -378,14 +386,18 @@ public class Profile extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if (follow) {
-                BTedit.setText("Dejar de seguir");
-                Toast.makeText(getActivity(), "Has comenzado a seguir a " + userProfile.getNick(),
-                        Toast.LENGTH_LONG).show();
-            } else {
-                BTedit.setText("Seguir");
-                Toast.makeText(getActivity(), "Has dejado de seguir a " + userProfile.getNick(),
-                        Toast.LENGTH_LONG).show();
+            if(result.equals("Actualización correcta")){
+                if (follow) {
+                    BTedit.setText("Dejar de seguir");
+                    Toast.makeText(getActivity(), "Has comenzado a seguir a " + userProfile.getNick(),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    BTedit.setText("Seguir");
+                    Toast.makeText(getActivity(), "Has dejado de seguir a " + userProfile.getNick(),
+                            Toast.LENGTH_LONG).show();
+                }
+            }else{
+                Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
 
             if (progressDialog != null) {

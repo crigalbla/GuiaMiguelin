@@ -5,7 +5,9 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -41,6 +44,8 @@ public class ContentMain extends Fragment implements OnItemClickListener {
 
     @BindView(R.id.recycle)
     RecyclerView recycle;
+    @BindView(R.id.swipe_recomendation)
+    SwipeRefreshLayout swipeRecomendation;
     Unbinder unbinder;
 
     private static final Gson gson = new Gson();
@@ -52,9 +57,11 @@ public class ContentMain extends Fragment implements OnItemClickListener {
     private Integer numberPubsOnAdapter = 0;
     // Parámetros de configuración
     private String average = "4";
+    private Double recomendedType = 4.0;
     private Double goodAverage = 2.5;
     private Double goodReview = 3.5;
-    private Double factorNotFollow = 0.5;
+    private Double factorNotFollow = 1.0;
+    private Double factorFollow = 1.5;
 
     private EstablishmentAdapter adapter;
 
@@ -66,13 +73,30 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         View view = inflater.inflate(R.layout.content_main, container, false);
 
         unbinder = ButterKnife.bind(this, view);
+        // Esto es un listener para refrescar la vista
+        swipeRecomendation.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshContent();
+            }
+        });
+
+        // Cuando cierro o abro sesión dejo a nulo todos los valores para que recomiende de nuevo
+        if( (userLogged == null && Preferences.obtenerPreferenceString(getActivity(),
+                Preferences.PREFERENCE_USER_LOGIN).length() > 0)
+                ||
+                (userLogged != null && Preferences.obtenerPreferenceString(getActivity(),
+                        Preferences.PREFERENCE_USER_LOGIN).length() == 0) ){
+            pubs = null;
+            restaurants = null;
+        }
+
         if(pubs == null && restaurants == null) {
             recomendationSystem();
         }else {
-            configAdapter();
             configReclyclerView();
-            generateEstablishment();
         }
+
         return view;
     }
 
@@ -85,6 +109,19 @@ public class ContentMain extends Fragment implements OnItemClickListener {
     // Botones -------------------------------------------------------------------------------------
 
     // Métodos auxiliares --------------------------------------------------------------------------
+
+    // Método del swipeRefresh
+    private void refreshContent() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                pubs = null;
+                restaurants = null;
+                recomendationSystem();
+                swipeRecomendation.setRefreshing(false);
+            }
+        }, 1000);
+    }
 
     @Override
     public void onItemClick(Establishment establishment) {
@@ -184,6 +221,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         if(userIdLogged != null && userIdLogged.length() > 0){
             mongoAPI("/users/" + userIdLogged, "USER");
         }else{
+            userLogged = null; // Esta línea es para el caso en el que cierro sesión
             mongoAPI("/pubs/mostPopular?average=" + average, "ESTABLISHMENTS");
         }
         return recomended;
@@ -279,9 +317,8 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                 mongoAPI("/pubs/", "ESTABLISHMENTS");
 
             } catch (Throwable throwable) {
-                // TODO esto peta cuando abro una pagina principal nuevamente...
-//                Toast.makeText(getActivity(), "Ha habido un problema al obtener la " +
-//                                "identificación del usuario", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Ha habido un problema al obtener la " +
+                                "identificación del usuario", Toast.LENGTH_LONG).show();
             }
 
             // Cerrar ventana de diálogo
@@ -332,6 +369,10 @@ public class ContentMain extends Fragment implements OnItemClickListener {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Buscado los mejores establecimientos...");
+            progressDialog.show();
         }
 
         @Override
@@ -360,7 +401,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                         }
                     }
 
-                    if(userLogged != null){ // Caso de esión iniciada
+                    if(userLogged != null){ // Caso de sesión iniciada
                         mongoAPI("/restaurants/","ESTABLISHMENTS");
                     }else {
                         mongoAPI("/restaurants/mostPopular?average=" + average,
@@ -388,9 +429,15 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                 }
 
             } catch (Throwable throwable) {
-                // TODO esto peta cuando abro una pagina principal nuevamente...
+                // No puedo poner este primer toast porque al cerrar sesión estoy creando un nuevo
+                // fragment y me peta...
 //                Toast.makeText(getActivity(), "Ha habido un problema al obtener los " +
 //                        "establecimientos", Toast.LENGTH_LONG).show();
+            }
+
+            // Cerrar ventana de diálogo
+            if (progressDialog != null) {
+                progressDialog.dismiss();
             }
         }
 
@@ -491,15 +538,16 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                 // punto 1 que coincida con el tipo le sumo 4 puntos más
                 for (int i = 0; i < pubs.length; i++)
                     if (types.contains(pubs[i].getTypePub().toString()))
-                        pubs[i].setPTRS(pubs[i].getPTRS() + 4);
+                        pubs[i].setPTRS(pubs[i].getPTRS() + recomendedType);
 
                 for (int i = 0; i < restaurants.length; i++)
                     if (types.contains(restaurants[i].getTypeRestaurant().toString()))
-                        restaurants[i].setPTRS(restaurants[i].getPTRS() + 4);
+                        restaurants[i].setPTRS(restaurants[i].getPTRS() + recomendedType);
 
                 mongoAPI("/reviews/recomendationSystem?values=" + values, "REVIEWS2");
             } catch (Throwable throwable) {
-                // TODO
+                Toast.makeText(getActivity(), "Ha habido un problema al obtener las reviews " +
+                        "de los establecimientos para recomendar", Toast.LENGTH_LONG).show();
             }
         }
 
@@ -589,7 +637,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                         for(Pub p: pubs){
                             if(rev.getEstablishment().equals(p.getId())){
                                 if(userLogged.getReviews().contains(rev.getAuthor()))
-                                    factor = 0.75;
+                                    factor = factorFollow;
                                 double morePTRS = (rev.getPuntuation() - goodAverage)*factor;
                                 p.setPTRS(p.getPTRS() + morePTRS);
                                 entra = false; // Para que coja la siguiente review
@@ -610,9 +658,12 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                     configAdapter();
                     configReclyclerView();
                     generateEstablishment();
+                    Toast.makeText(getActivity(), "Hacer scroll para renovar recomendación",
+                            Toast.LENGTH_LONG).show();
                 }
             } catch (Throwable throwable) {
-                // TODO
+                Toast.makeText(getActivity(), "Ha habido un problema al obtener las reviews " +
+                        "de los establecimientos para recomendar", Toast.LENGTH_LONG).show();
             }
 
             // Cerrar ventana de diálogo
@@ -687,7 +738,8 @@ public class ContentMain extends Fragment implements OnItemClickListener {
 
                 mongoAPI("/reviews/recomendationSystem2?values=", "REVIEWS2");
             } catch (Throwable throwable) {
-                // TODO
+                Toast.makeText(getActivity(), "Ha habido un problema al obtener los perfiles " +
+                        "de usuario para recomendar", Toast.LENGTH_LONG).show();
             }
         }
 

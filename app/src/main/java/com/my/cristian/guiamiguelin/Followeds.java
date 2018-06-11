@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -149,12 +150,16 @@ public class Followeds extends Fragment implements OnItemClickListener2 {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            FollowedsDomain followeds = gson.fromJson(result, FollowedsDomain.class);
-            users = followeds.getFolloweds();
+            try{
+                FollowedsDomain followeds = gson.fromJson(result, FollowedsDomain.class);
+                users = followeds.getFolloweds();
 
-            configAdapter();
-            configReclyclerView();
-            generateUser();
+                configAdapter();
+                configReclyclerView();
+                generateUser();
+            } catch (Throwable throwable) {
+                Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
 
             // Cerrar ventana de diálogo
             if (progressDialog != null) {

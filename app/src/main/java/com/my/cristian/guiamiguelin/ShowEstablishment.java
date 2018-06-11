@@ -167,7 +167,7 @@ public class ShowEstablishment extends Fragment {
 
     @OnClick({R.id.weStateHere, R.id.newReview})
     public void onViewClicked(View view) {
-        Fragment fragment = null;
+        Fragment fragment;
         Bundle args = new Bundle();
 
         switch (view.getId()) {
@@ -194,11 +194,8 @@ public class ShowEstablishment extends Fragment {
                         Preferences.PREFERENCE_USER_LOGIN).length() > 0) {
 
                     boolean permiso = true;
+                    if(reviews != null)
                     for(Review r: reviews){
-                        String a = Preferences.obtenerPreferenceString(getActivity(),
-                                Preferences.PREFERENCE_USER_NICK);
-                        String b = r.getAuthor();
-                        boolean c = a.equals(b);
                         if(Preferences.obtenerPreferenceString(getActivity(),
                                 Preferences.PREFERENCE_USER_NICK).equals(r.getAuthor())){
                             Toast.makeText(getActivity(),
@@ -241,18 +238,22 @@ public class ShowEstablishment extends Fragment {
 
     @OnClick(R.id.showCarte)
     public void showCarte() {
-        getActivity().setTitle("Carta");
-        Fragment fragment = new ShowCarte();
-        Bundle args = new Bundle();
-        if (pub != null) {
-            args.putString("carteId", pub.getCarte());
+        if(pub != null || restaurant != null){
+            getActivity().setTitle("Carta");
+            Fragment fragment = new ShowCarte();
+            Bundle args = new Bundle();
+            if (pub != null) {
+                args.putString("carteId", pub.getCarte());
+            }
+            if (restaurant != null) {
+                args.putString("carteId", restaurant.getCarte());
+            }
+            fragment.setArguments(args);
+            getActivity().getFragmentManager().beginTransaction()
+                    .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
+        }else {
+            Toast.makeText(getActivity(), "Error", Toast.LENGTH_LONG).show();
         }
-        if (restaurant != null) {
-            args.putString("carteId", restaurant.getCarte());
-        }
-        fragment.setArguments(args);
-        getActivity().getFragmentManager().beginTransaction()
-                .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
     }
 
     // Peticiones a la API -------------------------------------------------------------------------

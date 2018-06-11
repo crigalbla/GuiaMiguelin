@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity
             logout();
         } else if (id == R.id.principal) {
             toolbar.setTitle("Guía Miguelín");
-            fragment = new ContentMain();
             entra = true;
         } else if (id == R.id.maps) {
             toolbar.setTitle("Google Maps");
@@ -136,11 +135,10 @@ public class MainActivity extends AppCompatActivity
             itemSearch.setCheckable(true);
             itemSearch.setChecked(true);
         }
-        if(fragment != null){
+        if(fragment != null)
             transaction.replace(R.id.contenedor, fragment).addToBackStack(null).commit();
-            if(entra)
-                getFragmentManager().popBackStack(); // Esto es para que la vista contentMain no se repita
-        }
+        if(entra)
+            getFragmentManager().popBackStack(); // Esto es para que la vista contentMain no se repita
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

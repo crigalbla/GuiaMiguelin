@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -103,11 +104,14 @@ public class EditProfile extends Fragment {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.BTsend:
-                if(validations(etName, tName, "Rellenar nombre") &&
-                        validations(etSurnames, tSurnames, "Rellenar apellidos")){
-                    mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
-                            Preferences.PREFERENCE_USER_LOGIN), "PUT");
-                    getActivity().onBackPressed();
+                if(userLogged != null){
+                    if(validations(etName, tName, "Rellenar nombre") &&
+                            validations(etSurnames, tSurnames, "Rellenar apellidos")){
+                        mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
+                                Preferences.PREFERENCE_USER_LOGIN), "PUT");
+                    }
+                }else {
+                    Toast.makeText(getActivity(), "Error", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.BTcancelEdit:
@@ -161,26 +165,30 @@ public class EditProfile extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            userLogged = gson.fromJson(result, User.class);
-            if (userLogged != null) {
-                etName.setText(userLogged.getName());
-                etSurnames.setText(userLogged.getSurname());
-                Integer phone = (userLogged.getPhone() != null) ? new Integer(userLogged.getPhone()) : null;
-                String city = userLogged.getCity();
-                String email = userLogged.getEmail();
-                String pleasures = userLogged.getPleasures();
-                String description = userLogged.getDescription();
+            try {
+                userLogged = gson.fromJson(result, User.class);
+                if (userLogged != null) {
+                    etName.setText(userLogged.getName());
+                    etSurnames.setText(userLogged.getSurname());
+                    Integer phone = (userLogged.getPhone() != null) ? new Integer(userLogged.getPhone()) : null;
+                    String city = userLogged.getCity();
+                    String email = userLogged.getEmail();
+                    String pleasures = userLogged.getPleasures();
+                    String description = userLogged.getDescription();
 
-                if (phone != null)
-                    etPhone.setText(phone.toString());
-                if (city != null)
-                    etCity.setText(city);
-                if (email != null)
-                    etEmail.setText(email);
-                if (pleasures != null)
-                    etPleasures.setText(pleasures);
-                if (description != null)
-                    etDescription.setText(description);
+                    if (phone != null)
+                        etPhone.setText(phone.toString());
+                    if (city != null)
+                        etCity.setText(city);
+                    if (email != null)
+                        etEmail.setText(email);
+                    if (pleasures != null)
+                        etPleasures.setText(pleasures);
+                    if (description != null)
+                        etDescription.setText(description);
+                }
+            } catch (Throwable throwable) {
+                Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
 
             // Cerrar ventana de diálogo
@@ -252,6 +260,10 @@ public class EditProfile extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
+            if(!result.equals("Actualización correcta"))
+                Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_SHORT).show();
+
+            getActivity().onBackPressed();
             if (progressDialog != null) {
                 progressDialog.dismiss();
             }

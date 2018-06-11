@@ -216,7 +216,13 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            pubs = gson.fromJson(result, Pub[].class);
+            try {
+                pubs = gson.fromJson(result, Pub[].class);
+
+            } catch (Throwable throwable) {
+                Toast.makeText(getActivity(),"Error al parsear bares",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             // Cerrar ventana de diálogo
             if (progressDialog != null) {
@@ -286,11 +292,16 @@ public class EstablishmentSearch extends Fragment implements OnItemClickListener
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            restaurants = gson.fromJson(result, Restaurant[].class);
+            try {
+                restaurants = gson.fromJson(result, Restaurant[].class);
 
-            configAdapter();
-            configReclyclerView();
-            generateEstablishment();
+                configAdapter();
+                configReclyclerView();
+                generateEstablishment();
+            }catch (Throwable throwable){
+                Toast.makeText(getActivity(),"Error al parsear restaurantes",
+                        Toast.LENGTH_SHORT).show();
+            }
 
             // Cerrar ventana de diálogo
             if (progressDialog != null) {

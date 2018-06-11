@@ -163,8 +163,8 @@ public class CreateReview extends Fragment {
 
                 mongoAPI(tipo + idEstablecimiento, "ESTABLISHMENT");
             }else {
-                Toast.makeText(getActivity(), "Ha habido un problema al crear la reseña",
-                        Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "Ha habido un problema de conexión al crear " +
+                                "la reseña", Toast.LENGTH_LONG).show();
             }
 
             if (progressDialog != null) {
@@ -261,7 +261,7 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if(result != "Actualización fallida"){
+            if(result.equals("Actualización correcta")){
                 mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                         Preferences.PREFERENCE_USER_LOGIN), "GET-USER");
             }else {
@@ -379,16 +379,15 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if(result != null){
+            try{
                 User user = gson.fromJson(result, User.class);
                 putUser.setReviews(user.getReviews());  // Solo me hacen falta las reviews
 
                 mongoAPI("/users/" + Preferences.obtenerPreferenceString(getActivity(),
                         Preferences.PREFERENCE_USER_LOGIN), "PUT-USER");
-            }else {
-                Toast.makeText(getActivity(), "Ha habido un problema al obtner el usuario " +
-                                "creador de la reseña"
-                        , Toast.LENGTH_LONG).show();
+            }catch (Throwable throwable){
+                Toast.makeText(getActivity(), "Ha habido un problema al obtener el usuario " +
+                                "autor de la reseña", Toast.LENGTH_LONG).show();
             }
 
             if (progressDialog != null) {

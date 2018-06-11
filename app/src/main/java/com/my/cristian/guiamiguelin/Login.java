@@ -150,7 +150,8 @@ public class Login extends Fragment {
             try {
                 userLogged = gson.fromJson(result, User.class);
             } catch (Throwable throwable){
-                userLogged = new User();
+                Toast.makeText(getActivity(),"Fallo en la conexión",
+                        Toast.LENGTH_SHORT).show();
             }
 
             // Cerrar ventana de diálogo
