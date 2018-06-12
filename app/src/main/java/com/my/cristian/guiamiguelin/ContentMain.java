@@ -392,8 +392,8 @@ public class ContentMain extends Fragment implements OnItemClickListener {
             try {
                 if(pubs == null){
                     pubs = gson.fromJson(result, Pub[].class);
-                    //1.1. Les doy puntos en función de la nota media que tengan
-                    for (int i = 0; i < pubs.length; i++) {//TODO solo cuando sea buena puntuación
+                    //1.1. Les doy/quito puntos en función de la nota media que tengan
+                    for (int i = 0; i < pubs.length; i++) {
                         if (pubs[i].getReviews().size() > 0) {
                             pubs[i].setPTRS( (pubs[i].getAverage() - goodAverage)*2 );
                         }else {
@@ -544,7 +544,15 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                     if (types.contains(restaurants[i].getTypeRestaurant().toString()))
                         restaurants[i].setPTRS(restaurants[i].getPTRS() + recomendedType);
 
-                mongoAPI("/reviews/recomendationSystem?values=" + values, "REVIEWS2");
+                // Si el usuario aún no ha creado reviews, pasa a mostrarle ya los establecimientos
+                // que han sufrido modificaciones de puntos si el usuario sigue a alguien
+                if(values.equals("")){
+                    configAdapter();
+                    configReclyclerView();
+                    generateEstablishment();
+                }else{
+                    mongoAPI("/reviews/recomendationSystem?values=" + values, "REVIEWS2");
+                }
             } catch (Throwable throwable) {
                 Toast.makeText(getActivity(), "Ha habido un problema al obtener las reviews " +
                         "de los establecimientos para recomendar", Toast.LENGTH_LONG).show();
@@ -616,7 +624,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
             try {
                 reviews = gson.fromJson(result, Review[].class);
 
-                // Para obtener las reviews de los establecimientos que me han gustado
+                //3. Para obtener las reviews de los establecimientos que me han gustado
                 if(users == null){
                     String values = "";
 
@@ -630,7 +638,7 @@ public class ContentMain extends Fragment implements OnItemClickListener {
                         }
 
                     mongoAPI("/users/recomendationSystem?values=" + values, "USERS");
-                }else { // Para obtener las reviews de los usuarios con mis mismos gustos
+                }else { //4. Para obtener las reviews de los usuarios con mis mismos gustos
                     Double factor = factorNotFollow;
                     Boolean entra = true;
                     for(Review rev: reviews){

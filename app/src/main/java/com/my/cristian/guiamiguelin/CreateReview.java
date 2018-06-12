@@ -55,6 +55,8 @@ public class CreateReview extends Fragment {
     private Pub putPub = new Pub();
     private Restaurant putRestaurant = new Restaurant();
     private User putUser = new User();
+    private String tipo;
+    private String idEstablecimiento;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -156,11 +158,9 @@ public class CreateReview extends Fragment {
             super.onPostExecute(result);
 
             if(result != null){
-                String tipo = getArguments() != null ?
+                tipo = getArguments() != null ?
                         (String) getArguments().get("tipo") : null;
-                String idEstablecimiento = getArguments() != null ?
-                        (String) getArguments().get("id_establecimiento") : null;
-
+                
                 mongoAPI(tipo + idEstablecimiento, "ESTABLISHMENT");
             }else {
                 Toast.makeText(getActivity(), "Ha habido un problema de conexión al crear " +
@@ -179,7 +179,7 @@ public class CreateReview extends Fragment {
             BufferedReader bufferedReader = null;
 
             try {
-                String idEstablecimiento = getArguments() != null ?
+                idEstablecimiento = getArguments() != null ?
                         (String) getArguments().get("id_establecimiento") : null;
 
                 // Creo datos para enviarlos al servidor
@@ -285,8 +285,6 @@ public class CreateReview extends Fragment {
                     reseñas = null;
                 String notaMedia = getArguments() != null ?
                         (String) getArguments().get("nota_media") : null;
-                String tipo = getArguments() != null ?
-                        (String) getArguments().get("tipo") : null;
 
                 // Creo los datos a actualizar
                 String dataToSend = "";
@@ -309,11 +307,13 @@ public class CreateReview extends Fragment {
                 reviews.add(newReview.getId());
 
                 if(tipo.equals("/pubs/")){
+                    putPub.setId(idEstablecimiento);
                     putPub.setReviews(reviews);
                     putPub.setAverage(newAverage);
                     dataToSend = gson.toJson(putPub);
                 }
                 if(tipo.equals("/restaurants/")){
+                    putRestaurant.setId(idEstablecimiento);
                     putRestaurant.setReviews(reviews);
                     putRestaurant.setAverage(newAverage);
                     dataToSend = gson.toJson(putRestaurant);
@@ -458,11 +458,26 @@ public class CreateReview extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if(result != "Actualización fallida"){
+            if(result.equals("Actualización correcta")){
                 // Para terminar volemos a la actividad anterior, ahora debe de aparecer la reseña
-                Toast.makeText(getActivity(), "Reseña creada, refresca la vista haciendo " +
-                                "scroll para ver", Toast.LENGTH_LONG).show();
-                getActivity().onBackPressed();
+                Toast.makeText(getActivity(), "Reseña creada",
+                        Toast.LENGTH_LONG).show();
+                getFragmentManager().popBackStack(); // Salgo de la crear reseña
+                getFragmentManager().popBackStack(); // Y salgo de la vista antigua de establecimiento
+                Fragment fragment = new ShowEstablishment();
+                Bundle args = new Bundle();
+                if(tipo.equals("/pubs/")){
+                    getActivity().setTitle("Bar");
+                    args.putString("pubId", idEstablecimiento);
+                    fragment.setArguments(args);
+                }else {
+                    getActivity().setTitle("Restaurante");
+                    args.putString("restaurantId", idEstablecimiento);
+                    fragment.setArguments(args);
+                }
+
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, fragment).addToBackStack(null).commit();
             }else {
                 Toast.makeText(getActivity(), "Ha habido un problema al actualizar la " +
                         "reseña en el perfil del usuario", Toast.LENGTH_LONG).show();

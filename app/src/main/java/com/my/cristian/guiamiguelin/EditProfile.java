@@ -260,10 +260,18 @@ public class EditProfile extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if(!result.equals("Actualización correcta"))
+            if(!result.equals("Actualización correcta")) {
                 Toast.makeText(getActivity(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(getActivity(), "Datos de perfil actulizados",
+                        Toast.LENGTH_LONG).show();
+                getFragmentManager().popBackStack(); // Salgo de la vista editar
+                getFragmentManager().popBackStack(); // Y salgo de la vista antigua de perfil
+                getActivity().setTitle("Perfil de usuario");
+                getActivity().getFragmentManager().beginTransaction()
+                        .replace(R.id.contenedor, new Profile()).addToBackStack(null).commit();
+            }
 
-            getActivity().onBackPressed();
             if (progressDialog != null) {
                 progressDialog.dismiss();
             }

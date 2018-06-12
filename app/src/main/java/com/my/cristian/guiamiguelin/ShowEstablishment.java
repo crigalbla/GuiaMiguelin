@@ -5,8 +5,6 @@ import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,8 +53,6 @@ public class ShowEstablishment extends Fragment {
     RecyclerView establishmentReviews;
     @BindView(R.id.noReviews)
     TextView noReviews;
-    @BindView(R.id.swipe_container)
-    SwipeRefreshLayout swipeContainer;
     Unbinder unbinder;
 
     private static final Gson gson = new Gson();
@@ -75,14 +71,6 @@ public class ShowEstablishment extends Fragment {
 
         View view = inflater.inflate(R.layout.show_establishment, container, false);
         unbinder = ButterKnife.bind(this, view);
-
-        // Esto es un listener para refrescar la vista
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                refreshContent();
-            }
-        });
 
         if (pub != null && pub.getTypePub() != null) { // Casos en el que estoy pulsando back
             continuePub();
@@ -131,18 +119,6 @@ public class ShowEstablishment extends Fragment {
         for (Review r : reviews) {
             adapter.add(r);
         }
-    }
-
-    // Método del swipeRefresh
-    private void refreshContent() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                reviews = null;
-                firstOrRecharge();
-                swipeContainer.setRefreshing(false);
-            }
-        }, 1000);
     }
 
     // Cargo la vista por primera
