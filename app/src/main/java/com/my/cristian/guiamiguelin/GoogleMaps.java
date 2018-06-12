@@ -26,6 +26,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -37,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -49,6 +51,7 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
 
     View view = null;
     private static int PETICION_PERMISO_LOCALIZACION = 101;
+    Location location;
     private GoogleMap mMap;
     private Marker marker;
     double lat = 0.0;
@@ -58,6 +61,7 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
     Double cameraLat = 0.0;
     Double cameraLng = 0.0;
     boolean one = true;
+    boolean oneTime = true;
 
     private static final Gson gson = new Gson();
 
@@ -104,10 +108,10 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
                         .replace(")", "");
                 Fragment fragment = new ShowEstablishment();
                 Bundle args = new Bundle();
-                if(marker.getSnippet().toString().contains("Restaurante")){
+                if(marker.getSnippet().contains("Restaurante")){
                     getActivity().setTitle("Restaurante");
                     args.putString("restaurantCoordinates", coordinates);
-                }else if(marker.getSnippet().toString().contains("Bar")){
+                }else if(marker.getSnippet().contains("Bar")){
                     getActivity().setTitle("Bar");
                     args.putString("pubCoordinates", coordinates);
                 }
@@ -125,7 +129,6 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
         LocationManager mlocManager = (LocationManager) getActivity()
                 .getSystemService(Context.LOCATION_SERVICE);
         final boolean gpsEnabled = mlocManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean a = this.equals(new GoogleMaps());
         if (!gpsEnabled) {
             buildAlertMessageNoGps();
         }
@@ -152,11 +155,15 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
 
     private void agregateMarker(double lat, double lng) {
         LatLng coordinates = new LatLng(lat, lng);
-        CameraUpdate myLocation = CameraUpdateFactory.newLatLngZoom(coordinates, 16);
         if (marker != null) marker.remove();
         marker = mMap.addMarker(new MarkerOptions()
-                .position(coordinates));
-//        mMap.animateCamera(myLocation); // con esto situo la cámara de nuevo en donde estoy
+                .position(coordinates)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker2)));
+        if(oneTime){
+            CameraUpdate myLocation = CameraUpdateFactory.newLatLngZoom(coordinates, 16);
+            mMap.animateCamera(myLocation); // con esto situo la cámara donde estoy
+            oneTime = false;
+        }
     }
 
     private void uppdateUbication(Location location){
@@ -181,12 +188,16 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
         @Override
         public void onProviderEnabled(String s) {
             mensaje = ("GPS Activado");
-            Mensaje();
+            oneTime = true;
+            if(getActivity() != null)
+                Mensaje();
         }
 
         @Override
         public void onProviderDisabled(String s) {
             mensaje = ("GPS Desactivado");
+            if(marker != null)
+                marker.remove(); // Para eliminar mi posición del mapa
             if(getActivity() != null) { // Esto evita que pete cuando quitamos el GPS en otra vista
                 locationStart();
                 Mensaje();
@@ -201,9 +212,14 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
         } else {
             LocationManager locationManager = (LocationManager) getActivity()
                     .getSystemService(Context.LOCATION_SERVICE);
-            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            location = Objects.requireNonNull(locationManager).getLastKnownLocation(LocationManager.GPS_PROVIDER);
             uppdateUbication(location);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,0,locListener);
+            if(location != null) {
+                LatLng coordinates = new LatLng(lat, lng);
+                CameraUpdate myLocation = CameraUpdateFactory.newLatLngZoom(coordinates, 16);
+                mMap.animateCamera(myLocation); // con esto situo la cámara donde estoy
+            }
         }
     }
 
@@ -400,6 +416,13 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
                     LatLng camera = new LatLng(cameraLat/numberEstablishments,
                             cameraLng/numberEstablishments);
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(camera, 16));
+                }
+
+                if(location != null){
+                    LatLng coordinates = new LatLng(lat, lng);
+                    CameraUpdate myLocation = CameraUpdateFactory.newLatLngZoom(coordinates, 16);
+                    mMap.animateCamera(myLocation); // con esto situo la cámara donde estoy
+                    oneTime = false;
                 }
 
             } catch (Throwable throwable) {// En caso de que haya habido error, notifícamelo
