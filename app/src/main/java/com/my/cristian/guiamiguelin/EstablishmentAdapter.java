@@ -52,8 +52,7 @@ public class EstablishmentAdapter extends RecyclerView.Adapter<EstablishmentAdap
             holder.puntuation.setText("N/A");
         }
 
-        if(establishment.getId().length() > 23) // TODO quitar if cuando esté hecho la recomendación en la página principal
-            holder.idEstablishment.setText(establishment.getId());
+        holder.idEstablishment.setText(establishment.getId());
     }
 
     @Override

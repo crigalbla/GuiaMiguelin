@@ -137,7 +137,7 @@ public class GoogleMaps extends Fragment implements OnMapReadyCallback {
     // Petición de activar GPS
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("El GPS está desactivado, ¿quieres activalor?")
+        builder.setMessage("El GPS está desactivado, ¿quieres activarlo?")
                 .setCancelable(false)
                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog, final int id) {
